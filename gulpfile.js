@@ -184,7 +184,7 @@ task
             (
                 [
                     '*.js',
-                    '{dev,src,test}/**/*.{feature,js,mjs,ts}',
+                    '{dev,src,test,tools}/**/*.{feature,js,mjs,ts}',
                     'lib/**/*.ts',
                     '!lib/feature-all.d.ts',
                 ],

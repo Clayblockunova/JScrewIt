@@ -7,7 +7,6 @@ import progress                 from    './internal/progress.mjs';
 import SolutionBookMap          from    './internal/solution-book-map.mjs';
 import STRATEGY_TEST_DATA_LIST  from    './internal/strategy-test-data.js';
 import JScrewIt                 from    '../lib/jscrewit.js';
-import                                  '../tools/text-utils.js';
 import chalk                    from    'chalk';
 
 function checkMinInputLength

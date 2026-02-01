@@ -1,4 +1,4 @@
-/* global global, self */
+/* global self */
 
 'use strict';
 
