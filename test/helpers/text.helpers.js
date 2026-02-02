@@ -1,4 +1,4 @@
-/* global self */
+/* global global, self */
 
 'use strict';
 
@@ -34,4 +34,4 @@
         }
     );
 }
-)(typeof self === 'undefined' ? global : /* c8 ignore next */ self);
+)(typeof self === 'undefined' ? global : self);

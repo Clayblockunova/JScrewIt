@@ -1,14 +1,12 @@
 /* eslint-env node */
-/* global padLeft, padRight, repeat */
 
 'use strict';
 
-require('./text-utils');
 var timeUtils = require('./time-utils');
 
 function byteCount(size, width)
 {
-    var str = padLeft(size, width) + (size === 1 ? ' byte' : ' bytes');
+    var str = String(size).padStart(width) + (size === 1 ? ' byte' : ' bytes');
     return str;
 }
 
@@ -16,7 +14,7 @@ function createDiagnosticReport(perfLog)
 {
     var report =
     '\nStrategy                    Status         Length  Time (ms)\n' +
-    repeat('─', 60) + '\n' +
+    '─'.repeat(60) + '\n' +
     perfLog.reduce
     (
         function (str, perfInfoList)
@@ -60,7 +58,7 @@ function formatCodingLog(perfLog, padding, nextCodingLog)
 
 function formatInt(int)
 {
-    var str = int === undefined ? '-' : int;
+    var str = int === undefined ? '-' : String(int);
     return str;
 }
 
@@ -79,10 +77,10 @@ function formatPerfInfoList(perfInfoList, padding, paddingChars)
         var next = index < count - 1;
         str +=
         padding + (next ? '├' : '└') +
-        padRight(perfInfo.strategyName, 27 - paddingLength) +
-        padRight(perfInfo.status, 10) +
-        padLeft(formatInt(perfInfo.outputLength), 11) +
-        padLeft(formatInt(perfInfo.time), 11) +
+        perfInfo.strategyName.padEnd(27 - paddingLength) +
+        perfInfo.status.padEnd(10) +
+        formatInt(perfInfo.outputLength).padStart(11) +
+        formatInt(perfInfo.time).padStart(11) +
         '\n';
         perfLog = perfInfo.perfLog;
         if (perfLog)
