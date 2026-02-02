@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-/* eslint-env node */
-
 'use strict';
+
+const cli = require('./tools/cli');
 
 function fail()
 {
@@ -11,21 +11,21 @@ function fail()
 
 function getBasename()
 {
-    var path = require('path');
-    var basename = path.basename(process.argv[1]);
+    const path = require('node:path');
+    const basename = path.basename(process.argv[1]);
     return basename;
 }
 
 function printErrorMessage(errorMessage)
 {
-    var basename = getBasename();
+    const basename = getBasename();
     console.error
     ('%s: %s.\nTry "%s --help" for more information.', basename, errorMessage, basename);
 }
 
 function printHelpMessage()
 {
-    var message =
+    const message =
     'Usage: %s [OPTION]... [SOURCE [DESTINATION]]\n' +
     'Encodes JavaScript with JScrewIt.\n' +
     '\n' +
@@ -55,14 +55,14 @@ function printHelpMessage()
     '  none                    (none available)\n' +
     '\n' +
     'See the JScrewIt feature documentation for a list of all supported features.\n';
-    var basename = getBasename();
+    const basename = getBasename();
     console.log(message, basename);
 }
 
 function printVersion()
 {
-    var version = require('./package.json').version;
-    console.log('JScrewIt ' + version);
+    const { version } = require('./package.json');
+    console.log(`JScrewIt ${version}`);
 }
 
 function prompt()
@@ -70,114 +70,98 @@ function prompt()
     process.stdout.write('SCREW> ');
 }
 
-(function ()
+let command;
+try
 {
-    var cli = require('./tools/cli');
+    command = cli.parseCommandLine(process.argv);
+}
+catch (error)
+{
+    printErrorMessage(error.message);
+    fail();
+}
+if (command === 'help')
+{
+    printHelpMessage();
+    return;
+}
+if (command === 'version')
+{
+    printVersion();
+    return;
+}
 
-    var command;
-    try
-    {
-        command = cli.parseCommandLine(process.argv);
-    }
-    catch (error)
-    {
-        printErrorMessage(error.message);
-        fail();
-    }
-    if (command === 'help')
-    {
-        printHelpMessage();
-        return;
-    }
-    if (command === 'version')
-    {
-        printVersion();
-        return;
-    }
+const { inputFileName, outputFileName, options } = command;
+const JScrewIt = require('.');
 
-    var inputFileName   = command.inputFileName;
-    var outputFileName  = command.outputFileName;
-    var options         = command.options;
-
-    var JScrewIt = require('.');
-
-    if (inputFileName == null)
+if (inputFileName == null)
+{
+    const tryEncode =
+    input =>
     {
-        var tryEncode =
-        function (input)
-        {
-            var output;
-            try
-            {
-                output = JScrewIt.encode(input, options);
-            }
-            catch (error)
-            {
-                console.error('%s', error.message);
-            }
-            return output;
-        };
-        if (tryEncode('') == null) // validate options
-            fail();
-        var readline = require('readline');
-        var rl = readline.createInterface({ input: process.stdin, terminal: false });
-        rl.on
-        (
-            'line',
-            function (input)
-            {
-                if (input)
-                {
-                    var output = tryEncode(input);
-                    if (output != null)
-                        console.log(output);
-                }
-                prompt();
-            }
-        );
-        prompt();
-    }
-    else
-    {
-        var fs = require('fs');
-        var timeUtils = require('./tools/time-utils');
-
-        var input;
-        var output;
-        var encodingTime;
+        let output;
         try
         {
-            input = fs.readFileSync(inputFileName);
-            encodingTime =
-            timeUtils.timeThis
-            (
-                function ()
-                {
-                    output = JScrewIt.encode(input, options);
-                }
-            );
-            if (outputFileName != null)
-                fs.writeFileSync(outputFileName, output);
-            else
-                console.log(output);
+            output = JScrewIt.encode(input, options);
         }
         catch (error)
         {
             console.error('%s', error.message);
-            fail();
         }
-        if (outputFileName != null)
+        return output;
+    };
+    if (tryEncode('') == null) // validate options
+        fail();
+    const { createInterface } = require('node:readline');
+    const rl = createInterface({ input: process.stdin, terminal: false });
+    rl.on
+    (
+        'line',
+        input =>
         {
-            var perfInfo = options.perfInfo;
-            var perfLog = perfInfo && perfInfo.perfLog;
-            if (perfLog)
+            if (input)
             {
-                var diagnosticReport = cli.createDiagnosticReport(perfLog);
-                console.log(diagnosticReport);
+                const output = tryEncode(input);
+                if (output != null)
+                    console.log(output);
             }
-            var report = cli.createReport(input.length, output.length, encodingTime);
-            console.log(report);
+            prompt();
+        },
+    );
+    prompt();
+}
+else
+{
+    const fs = require('node:fs');
+    const timeUtils = require('./tools/time-utils');
+
+    let input;
+    let output;
+    let encodingTime;
+    try
+    {
+        input = fs.readFileSync(inputFileName);
+        encodingTime =
+        timeUtils.timeThis(() => { output = JScrewIt.encode(input, options); });
+        if (outputFileName != null)
+            fs.writeFileSync(outputFileName, output);
+        else
+            console.log(output);
+    }
+    catch (error)
+    {
+        console.error('%s', error.message);
+        fail();
+    }
+    if (outputFileName != null)
+    {
+        const perfLog = options.perfInfo?.perfLog;
+        if (perfLog)
+        {
+            const diagnosticReport = cli.createDiagnosticReport(perfLog);
+            console.log(diagnosticReport);
         }
+        const report = cli.createReport(input.length, output.length, encodingTime);
+        console.log(report);
     }
 }
-)();
