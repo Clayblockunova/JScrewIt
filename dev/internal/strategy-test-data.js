@@ -188,13 +188,13 @@ module.exports =
             'AT',
             'BARPROP',
             'CONSOLE',
+            'FF_SRC',
             'FLAT',
             'FROM_CODE_POINT',
             'INCR_CHAR',
             'ITERATOR_HELPER',
-            'NO_V8_SRC',
         ],
-        createDictTestString.bind(null, 120),
+        createDictTestString.bind(null, 60),
         'byDictRadix4AmendedBy1',
     ),
     data
@@ -211,7 +211,7 @@ module.exports =
             'ITERATOR_HELPER',
             'NAME',
         ],
-        createDictTestString.bind(null, 119),
+        createDictTestString.bind(null, 51),
         'byDictRadix4AmendedBy2',
     ),
     data
@@ -219,6 +219,22 @@ module.exports =
         ['ARROW', 'AT', 'BARPROP', 'CONSOLE', 'FF_SRC', 'FLAT', 'FROM_CODE_POINT', 'INCR_CHAR'],
         createDictTestString.bind(null, 63),
         'byDictRadix5',
+    ),
+    data
+    (
+        [
+            'ARRAY_ITERATOR',
+            'ARROW',
+            'AT',
+            'BARPROP',
+            'CONSOLE',
+            'FF_SRC',
+            'FLAT',
+            'FROM_CODE_POINT',
+            'ITERATOR_HELPER',
+        ],
+        createDictTestString.bind(null, 112),
+        'byDictRadix5AmendedBy2',
     ),
     data
     (

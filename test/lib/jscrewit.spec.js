@@ -1092,7 +1092,8 @@ self,
                         featureObj,
                         function ()
                         {
-                            var input = strategy.expressionMode ? JSON.stringify(text) : text;
+                            var input =
+                            strategy.encodingType === 'expression' ? JSON.stringify(text) : text;
                             var output = strategy.call(encoder, Object(input));
                             expect(output).toBeJSFuck();
                             expect(emuEval(this.test.emuFeatureNames, output)).toBe(text);
