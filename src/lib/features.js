@@ -113,11 +113,12 @@ var featureInfos =
     },
     AT:
     {
-        description: 'Existence of the native function Array.prototype.at.',
+        description:
+        'Existence of the native functions Array.prototype.at and String.prototype.at.',
         check:
         function ()
         {
-            var available = Array.prototype.at;
+            var available = Array.prototype.at && String.prototype.at;
             return available;
         },
     },

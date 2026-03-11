@@ -24,7 +24,7 @@ jobs:
         npm run --workspaces make
         gulp lint
         gulp bundle:lib
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v7
       with:
         name: lib
         path: lib
@@ -46,7 +46,7 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
-    - uses: actions/download-artifact@v6
+    - uses: actions/download-artifact@v8
       with:
         name: lib
         path: lib

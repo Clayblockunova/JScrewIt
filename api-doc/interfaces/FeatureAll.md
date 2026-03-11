@@ -38,7 +38,7 @@ Available in Chrome, Edge, Firefox, Safari, Opera, and Node.js.
 
 > **AT**: [`ElementaryFeature`](ElementaryFeature.md)
 
-Existence of the native function Array.prototype.at.
+Existence of the native functions Array.prototype.at and String.prototype.at.
 
 #### Remarks
 
