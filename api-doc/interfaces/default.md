@@ -8,7 +8,7 @@
 
 ### encode
 
-> **encode**: [`encode`](encode.md)
+> **encode**: [`EncodeInterface`](EncodeInterface.md)
 
 ***
 

@@ -108,11 +108,8 @@ export interface Feature
     CustomFeature;
 }
 
-export const Feature: FeatureConstructor;
-
 export interface FeatureConstructor extends FeatureAll
 {
-
     /**
      * Creates a new feature object from the union of the specified features.
      *

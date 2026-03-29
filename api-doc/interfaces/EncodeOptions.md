@@ -8,7 +8,7 @@
 
 ### features?
 
-> `optional` **features**: [`FeatureElementOrCompatibleArray`](../type-aliases/FeatureElementOrCompatibleArray.md)
+> `optional` **features?**: [`FeatureElementOrCompatibleArray`](../type-aliases/FeatureElementOrCompatibleArray.md)
 
 Specifies the features available in the engines that evaluate the encoded output.
 
@@ -20,7 +20,7 @@ To generate shorter code, specify all features available in all target engines e
 
 ### runAs?
 
-> `optional` **runAs**: [`RunAs`](../type-aliases/RunAs.md)
+> `optional` **runAs?**: [`RunAs`](../JScrewIt/namespaces/EncodeOptions/type-aliases/RunAs.md)
 
 This option controls the type of code generated from the given input.
 Allowed values are listed below.
@@ -73,7 +73,7 @@ plain string.
 
 ### trimCode?
 
-> `optional` **trimCode**: `boolean`
+> `optional` **trimCode?**: `boolean`
 
 If this parameter is truthy, lines in the beginning and in the end of the file containing
 nothing but space characters and JavaScript comments are removed from the generated output.
@@ -89,6 +89,6 @@ code.
 
 ### wrapWith?
 
-> `optional` **wrapWith**: [`RunAs`](../type-aliases/RunAs.md)
+> `optional` **wrapWith?**: [`RunAs`](../JScrewIt/namespaces/EncodeOptions/type-aliases/RunAs.md)
 
 An alias for `runAs`.

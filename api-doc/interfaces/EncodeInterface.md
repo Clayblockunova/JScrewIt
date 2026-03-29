@@ -2,9 +2,9 @@
 
 ***
 
-# Interface: encode()
+# Interface: EncodeInterface()
 
-> **encode**(`input`, `options?`): `string`
+> **EncodeInterface**(`input`, `options?`): `string`
 
 Encodes a given string into JSFuck.
 
