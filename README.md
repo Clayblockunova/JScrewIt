@@ -241,6 +241,9 @@ Explorer 11
 <br>
  ![Node.js](https://api.iconify.design/mdi:nodejs.svg) Node.js 20+
 
+JScrewIt 3 drops compatibility with engines not supported by jQuery 4, including Internet Explorer 9
+and 10, the Android Stock Browser, and older Safari and Node.js versions.
+
 ### Engine Support Policy
 
 Only the most recent stable version of Chrome, Safari, Edge, Firefox and Opera are guaranteed to be
