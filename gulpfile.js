@@ -182,18 +182,7 @@ task
                     '!lib/feature-all.d.ts',
                 ],
             )
-            .pipe
-            (
-                gulpESLintNew
-                (
-                    {
-                        configType:         'flat',
-                        overrideConfig,
-                        overrideConfigFile: true,
-                        warnIgnored:        true,
-                    },
-                ),
-            )
+            .pipe(gulpESLintNew({ overrideConfig, overrideConfigFile: true, warnIgnored: true }))
             .pipe(gulpESLintNew.format('compact'))
             .pipe(gulpESLintNew.failAfterError());
             return stream;
