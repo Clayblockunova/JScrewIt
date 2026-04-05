@@ -205,16 +205,6 @@ var featureInfos =
         includes: ['NO_IE_SRC', 'NO_V8_SRC'],
         excludes: ['NO_FF_SRC'],
     },
-    FILL:
-    {
-        description: 'Existence of the native function Array.prototype.fill.',
-        check:
-        function ()
-        {
-            var available = Array.prototype.fill;
-            return available;
-        },
-    },
     FLAT:
     {
         description: 'Existence of the native function Array.prototype.flat.',
@@ -510,7 +500,6 @@ var featureInfos =
             'BARPROP',
             'DOCUMENT',
             'ESC_HTML_QUOT',
-            'FILL',
             'FLAT',
             'FROM_CODE_POINT',
             'FUNCTION_19_LF',
@@ -553,7 +542,6 @@ var featureInfos =
             'BARPROP',
             'DOCUMENT',
             'ESC_HTML_QUOT',
-            'FILL',
             'FLAT',
             'FROM_CODE_POINT',
             'FUNCTION_19_LF',
@@ -604,7 +592,6 @@ var featureInfos =
             'DOCUMENT',
             'ESC_HTML_QUOT',
             'FF_SRC',
-            'FILL',
             'FLAT',
             'FROM_CODE_POINT',
             'FUNCTION_19_LF',
@@ -681,7 +668,6 @@ var featureInfos =
             'ARROW',
             'AT',
             'ESC_HTML_QUOT',
-            'FILL',
             'FLAT',
             'FROM_CODE_POINT',
             'FUNCTION_19_LF',
@@ -727,7 +713,6 @@ var featureInfos =
             'DOCUMENT',
             'ESC_HTML_QUOT',
             'FF_SRC',
-            'FILL',
             'FLAT',
             'FROM_CODE_POINT',
             'FUNCTION_19_LF',

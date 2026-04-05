@@ -272,18 +272,6 @@ Available in Firefox and Safari.
 
 ***
 
-### FILL
-
-> **FILL**: [`ElementaryFeature`](ElementaryFeature.md)
-
-Existence of the native function Array.prototype.fill.
-
-#### Remarks
-
-Available in Chrome, Edge, Firefox, Safari, Opera, and Node.js.
-
-***
-
 ### FLAT
 
 > **FLAT**: [`ElementaryFeature`](ElementaryFeature.md)

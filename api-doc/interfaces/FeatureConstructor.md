@@ -478,22 +478,6 @@ Available in Firefox and Safari.
 
 ***
 
-### FILL
-
-> **FILL**: [`ElementaryFeature`](ElementaryFeature.md)
-
-Existence of the native function Array.prototype.fill.
-
-#### Remarks
-
-Available in Chrome, Edge, Firefox, Safari, Opera, and Node.js.
-
-#### Inherited from
-
-[`FeatureAll`](FeatureAll.md).[`FILL`](FeatureAll.md#fill)
-
-***
-
 ### FLAT
 
 > **FLAT**: [`ElementaryFeature`](ElementaryFeature.md)
@@ -1062,7 +1046,7 @@ JScrewIt.Feature.areCompatible("V8_SRC", "IE_SRC")
 
 ```js
 // true
-JScrewIt.Feature.areCompatible(JScrewIt.Feature.DEFAULT, JScrewIt.Feature.FILL)
+JScrewIt.Feature.areCompatible(JScrewIt.Feature.DEFAULT, JScrewIt.Feature.FLAT)
 ```
 
 ***

@@ -31,6 +31,18 @@
         return descriptor;
     }
 
+    function createNativeFunctionDescriptor(name, fn)
+    {
+        fn.toString =
+        function ()
+        {
+            var str = String(Array.prototype.join).replace(/\bjoin\b/, name);
+            return str;
+        };
+        var descriptor = { value: fn };
+        return descriptor;
+    }
+
     function createStaticSupplier(value)
     {
         function supplier()
@@ -162,22 +174,6 @@
             adapterList.function = oldDescriptor.value;
         }
         adapterList.push(adapter);
-    }
-
-    function makeEmuFeatureArrayPrototypeFunction(name, fn)
-    {
-        var setUp =
-        function ()
-        {
-            fn.toString =
-            function ()
-            {
-                var str = String(Array.prototype.join).replace(/\bjoin\b/, name);
-                return str;
-            };
-            override(this, 'Array.prototype.' + name, { value: fn });
-        };
-        return setUp;
     }
 
     function makeEmuFeatureDocument(str, regExp)
@@ -571,22 +567,19 @@
         function ()
         {
             var name = 'at';
-            var fn =
-            function (index)
-            {
-                index |= 0;
-                if (index < 0)
-                    index += this.length;
-                var element = this[index];
-                return element;
-            };
-            fn.toString =
-            function ()
-            {
-                var str = String(Array.prototype.join).replace(/\bjoin\b/, name);
-                return str;
-            };
-            var descriptor = { value: fn };
+            var descriptor =
+            createNativeFunctionDescriptor
+            (
+                name,
+                function (index)
+                {
+                    index |= 0;
+                    if (index < 0)
+                        index += this.length;
+                    var element = this[index];
+                    return element;
+                }
+            );
             override(this, 'Array.prototype.' + name, descriptor);
             override(this, 'String.prototype.' + name, descriptor);
         },
@@ -656,25 +649,30 @@
             /&quot;/
         ),
         FF_SRC:                 makeEmuFeatureNativeFunctionSource(NATIVE_FUNCTION_SOURCE_INFO_FF),
-        FILL:                   makeEmuFeatureArrayPrototypeFunction('fill', Function()),
         FLAT:
-        makeEmuFeatureArrayPrototypeFunction
-        (
-            'flat',
-            function ()
-            {
-                var array = [];
-                Array.prototype.forEach.call
-                (
-                    this,
-                    function (element)
-                    {
-                        array = array.concat(element);
-                    }
-                );
-                return array;
-            }
-        ),
+        function ()
+        {
+            var name = 'flat';
+            var descriptor =
+            createNativeFunctionDescriptor
+            (
+                name,
+                function ()
+                {
+                    var array = [];
+                    Array.prototype.forEach.call
+                    (
+                        this,
+                        function (element)
+                        {
+                            array = array.concat(element);
+                        }
+                    );
+                    return array;
+                }
+            );
+            override(this, 'Array.prototype.' + name, descriptor);
+        },
         FROM_CODE_POINT:
         function ()
         {

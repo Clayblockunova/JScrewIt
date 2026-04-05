@@ -213,7 +213,7 @@ export interface FeatureConstructor extends FeatureAll
      *
      * ```js
      * // true
-     * JScrewIt.Feature.areCompatible(JScrewIt.Feature.DEFAULT, JScrewIt.Feature.FILL)
+     * JScrewIt.Feature.areCompatible(JScrewIt.Feature.DEFAULT, JScrewIt.Feature.FLAT)
      * ```
      */
     areCompatible(...features: FeatureElement[]): boolean;

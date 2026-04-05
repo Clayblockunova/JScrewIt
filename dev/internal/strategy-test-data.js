@@ -78,7 +78,7 @@ module.exports =
 [
     data
     (
-        ['ARRAY_ITERATOR', 'CAPITAL_HTML', 'FILL', 'NO_V8_SRC', 'STATUS'],
+        ['ARRAY_ITERATOR', 'CAPITAL_HTML', 'NO_V8_SRC', 'STATUS'],
         length => String.fromCharCode(59999).repeat(length),
         'byCharCodes',
     ),

@@ -358,12 +358,12 @@ self,
             );
             emuIt
             (
-                'returns correct JSFuck with feature ARROW, FILL and NO_IE_SRC',
-                Feature('ARROW', 'FILL', 'NO_IE_SRC'),
+                'returns correct JSFuck with feature ARROW, FLAT and NO_IE_SRC',
+                Feature('ARROW', 'FLAT', 'NO_IE_SRC'),
                 function ()
                 {
                     var encoder =
-                    JScrewIt.debug.createEncoder(Feature('ARROW', 'FILL', 'NO_IE_SRC'));
+                    JScrewIt.debug.createEncoder(Feature('ARROW', 'FLAT', 'NO_IE_SRC'));
                     var input = 'Never gonna give you up / Never gonna let you down';
                     var output = encoder._encodeByDict(Object(input), 4);
                     expect(output).toBeJSFuck();
@@ -875,7 +875,7 @@ self,
                 return result;
             }
 
-            JScrewIt.debug.defineConstant(encoder, 'A', 'FILL');
+            JScrewIt.debug.defineConstant(encoder, 'A', 'FLAT');
             JScrewIt.debug.defineConstant(encoder, 'B', 'C');
             JScrewIt.debug.defineConstant(encoder, 'C', 'B');
             JScrewIt.debug.defineConstant(encoder, 'D', '?');
@@ -913,7 +913,7 @@ self,
                         function ()
                         {
                             expect(debugReplacer('A')).toThrowStrictly
-                            (SyntaxError, 'Undefined identifier FILL in the definition of A');
+                            (SyntaxError, 'Undefined identifier FLAT in the definition of A');
                         }
                     );
                     it
