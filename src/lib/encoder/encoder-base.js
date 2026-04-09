@@ -38,8 +38,6 @@ import replaceCharByUnescape                                    from './replace-
 import { MASK_EMPTY, maskIncludes }                             from '~feature-hub';
 import { SolutionType }                                         from '~solution';
 
-var ATOB_MASK = Feature.ATOB.mask;
-
 var STATIC_CHAR_CACHE   = createEmpty();
 var STATIC_CONST_CACHE  = createEmpty();
 var STATIC_ENCODER      = new Encoder(MASK_EMPTY);
@@ -84,14 +82,6 @@ function callResolver(encoder, stackName, resolver)
     {
         stack.pop();
     }
-}
-
-function defaultResolveCharacter(encoder, char)
-{
-    var charCode = char.charCodeAt();
-    var atobOpt = charCode < 0x100;
-    var solution = encoder._createCharDefaultSolution(char, charCode, atobOpt, true, true, true);
-    return solution;
 }
 
 function findOptimalSolution(encoder, source, entries, defaultSolutionType)
@@ -316,8 +306,6 @@ var matchSimpleAt =
         function (str, index)
         {
             regExp.lastIndex = index;
-            // String.prototype.match doesn't work well with sticky regular expressions in Node.js <
-            // 6.5.
             var match = regExp.exec(str);
             if (match)
                 return match[0];
@@ -348,37 +336,44 @@ assignNoEnum
         function (char, charCode, atobOpt, charCodeOpt, escSeqOpt, unescapeOpt)
         {
             var solution;
-            if (atobOpt && this.hasFeatures(ATOB_MASK))
+            var solutions = [];
+            if (atobOpt)
             {
                 solution =
                 resolveCharByDefaultMethod(this, char, charCode, replaceCharByAtob, 'atob');
+                solutions.push(solution);
             }
-            else
+            if (charCodeOpt)
             {
-                var solutions = [];
-                if (charCodeOpt)
-                {
-                    solution =
-                    resolveCharByDefaultMethod
-                    (this, char, charCode, replaceCharByCharCode, 'char-code');
-                    solutions.push(solution);
-                }
-                if (escSeqOpt)
-                {
-                    solution =
-                    resolveCharByDefaultMethod
-                    (this, char, charCode, replaceCharByEscSeq, 'esc-seq');
-                    solutions.push(solution);
-                }
-                if (unescapeOpt)
-                {
-                    solution =
-                    resolveCharByDefaultMethod
-                    (this, char, charCode, replaceCharByUnescape, 'unescape');
-                    solutions.push(solution);
-                }
-                solution = shortestOf.apply(null, solutions);
+                solution =
+                resolveCharByDefaultMethod
+                (this, char, charCode, replaceCharByCharCode, 'char-code');
+                solutions.push(solution);
             }
+            if (escSeqOpt)
+            {
+                solution =
+                resolveCharByDefaultMethod(this, char, charCode, replaceCharByEscSeq, 'esc-seq');
+                solutions.push(solution);
+            }
+            if (unescapeOpt)
+            {
+                solution =
+                resolveCharByDefaultMethod(this, char, charCode, replaceCharByUnescape, 'unescape');
+                solutions.push(solution);
+            }
+            solution = shortestOf.apply(null, solutions);
+            return solution;
+        },
+
+        _defaultResolveCharacter:
+        function (char)
+        {
+            var charCode = char.charCodeAt();
+            var atobOpt = charCode < 0x100;
+            var stdOpt = !atobOpt;
+            var solution =
+            this._createCharDefaultSolution(char, charCode, atobOpt, stdOpt, stdOpt, stdOpt);
             return solution;
         },
 
@@ -512,18 +507,6 @@ assignNoEnum
             return included;
         },
 
-        // The maximum value that can be safely used as the first group threshold of a ScrewBuffer.
-        // "Safely" means such that the extreme decoding test is passed in all engines.
-        // This value is typically limited by the free memory available on the stack, and since the
-        // memory layout of the stack changes at runtime in an unstable way, the maximum safe value
-        // cannot be determined exactly.
-        // The lowest recorded value so far is 1844, measured in an Android Browser 4.2.2 running on
-        // an Intel Atom emulator.
-        // Internet Explorer on Windows Phone occasionally failed the extreme decoding test in a
-        // non-reproducible manner, although the issue seems to be related to the output size rather
-        // than the grouping threshold setting.
-        maxGroupThreshold:      1800,
-
         replaceExpr:
         function (expr, optimize)
         {
@@ -607,7 +590,7 @@ assignNoEnum
             options = options || { };
             var optimizerList = this._getOptimizerList(str, options.optimize);
             var screwMode = options.screwMode || SCREW_NORMAL;
-            var buffer = new ScrewBuffer(screwMode, this.maxGroupThreshold, optimizerList);
+            var buffer = new ScrewBuffer(screwMode, optimizerList);
             var firstSolution = options.firstSolution;
             var maxLength = options.maxLength;
             if (firstSolution)
@@ -631,7 +614,8 @@ assignNoEnum
                     var char = str[index++];
                     solution = this.resolveCharacter(char);
                 }
-                if (!buffer.append(solution) || buffer.length > maxLength)
+                buffer.append(solution);
+                if (buffer.length > maxLength)
                     return;
             }
             var replacement = _String(buffer);
@@ -689,7 +673,7 @@ assignNoEnum
                             if (entries)
                                 solution = findOptimalSolution(this, char, entries);
                             if (!solution)
-                                solution = defaultResolveCharacter(this, char);
+                                solution = this._defaultResolveCharacter(char);
                         }
                         else
                         {

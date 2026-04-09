@@ -15,9 +15,9 @@
         {
             var actual = this.value;
             if (!(actual instanceof Feature))
-                throw new Error('Actual value must be a feature object');
+                throw Error('Actual value must be a feature object');
             if (!(expected instanceof Feature))
-                throw new Error('Expected value must be a feature object');
+                throw Error('Expected value must be a feature object');
             var message =
             this.generateMessage(actual, this.expr, 'to be equal to feature', expected);
             var pass = Feature.areEqual(actual, expected);
@@ -167,13 +167,11 @@
                                 actualFeatureName: 'BROWSER',
                                 expectedFeatureNames:
                                 [
-                                    'ANDRO_4_0',
-                                    'ANDRO_4_4',
                                     'CHROME_PREV',
                                     'FF_ESR',
-                                    'IE_9',
                                     'IE_11',
-                                    'SAFARI_7_0',
+                                    'IE_11_WIN_10',
+                                    'SAFARI_PRE_PREV',
                                     'SAFARI',
                                 ],
                             },
@@ -245,10 +243,10 @@
                     );
                 }
             );
-            it.per([Feature.ARROW, Feature.ASYNC_FUNCTION])
+            it
             (
-                '#.name check returns false',
-                function (featureObj)
+                'ARROW check returns false',
+                function ()
                 {
                     var Function = global.Function;
                     global.Function =
@@ -258,7 +256,7 @@
                     };
                     try
                     {
-                        var check = featureObj.check;
+                        var check = Feature.ARROW.check;
                         var available = check();
                         expect(available).toBe(false);
                     }
@@ -270,25 +268,25 @@
             );
             it
             (
-                'GENERIC_ARRAY_TO_STRING check returns false',
+                'SHORT_LOCALES check returns false',
                 function ()
                 {
-                    var prototype = Array.prototype;
-                    var toString = prototype.toString;
-                    prototype.toString =
+                    var prototype = Number.prototype;
+                    var toLocaleString = prototype.toLocaleString;
+                    prototype.toLocaleString =
                     function ()
                     {
-                        throw TypeError();
+                        return String(this);
                     };
                     try
                     {
-                        var check = Feature.GENERIC_ARRAY_TO_STRING.check;
+                        var check = Feature.SHORT_LOCALES.check;
                         var available = check();
                         expect(available).toBe(false);
                     }
                     finally
                     {
-                        prototype.toString = toString;
+                        prototype.toLocaleString = toLocaleString;
                     }
                 }
             );
@@ -303,7 +301,7 @@
                         function ()
                         {
                             var featureObj = Feature.WINDOW.restrict('web-worker');
-                            expect(featureObj).toEqualFeature(Feature.DEFAULT);
+                            expect(featureObj).toEqualFeature(Feature.SELF);
                         }
                     );
                     it
@@ -311,8 +309,8 @@
                         'restricts a feature in a particular engine',
                         function ()
                         {
-                            var featureObj = Feature.WINDOW.restrict('web-worker', [Feature.FF]);
-                            expect(featureObj).toEqualFeature(Feature.SELF_OBJ);
+                            var featureObj = Feature.WINDOW.restrict('web-worker', [Feature.IE_11]);
+                            expect(featureObj).toEqualFeature(Feature.OBJECT_W_SELF);
                         }
                     );
                     it

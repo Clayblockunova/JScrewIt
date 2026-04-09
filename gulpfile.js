@@ -137,11 +137,11 @@ task
                     rules:              { 'internal/sorted-definitions': 'error' },
                 },
                 {
-                    files:              ['dev/**/*.js', 'gulpfile.js', 'test/patch-cov-source.js'],
+                    files:
+                    ['*.js', 'dev/**/*.js', 'test/patch-cov-source.js', 'tools/**/*.js'],
                     ignores:            ['dev/legacy'],
                     jsVersion:          2022,
                     languageOptions:    { globals: globals.node, sourceType: 'commonjs' },
-                    rules:              { 'object-shorthand': 'error' },
                 },
                 {
                     files:              ['dev/**/*.mjs'],
@@ -149,16 +149,10 @@ task
                     languageOptions:    { globals: globals.node },
                 },
                 {
-                    files:
-                    ['dev/legacy/**/*.js', 'screw.js', 'src/ui/worker.js', 'tools/**/*.js'],
+                    files:              ['dev/legacy/**/*.js', 'src/ui/worker.js'],
                     jsVersion:          5,
                     languageOptions:    { sourceType: 'commonjs' },
                     processor:          new EslintEnvProcessor(),
-                    rules:
-                    {
-                        // process.exitCode is not supported in Node.js 0.10.
-                        'no-process-exit': 'off',
-                    },
                 },
                 {
                     files:              ['test/**/*.js'],
@@ -167,7 +161,6 @@ task
                     languageOptions:    { sourceType: 'script' },
                     plugins:            ebddPlugins,
                     processor:          new EslintEnvProcessor({ plugins: ebddPlugins }),
-                    rules:              { '@origin-1/no-extra-new': 'off' },
                 },
                 {
                     files:              ['lib/**/*.ts'],
@@ -184,23 +177,12 @@ task
             (
                 [
                     '*.js',
-                    '{dev,src,test}/**/*.{feature,js,mjs,ts}',
+                    '{dev,src,test,tools}/**/*.{feature,js,mjs,ts}',
                     'lib/**/*.ts',
                     '!lib/feature-all.d.ts',
                 ],
             )
-            .pipe
-            (
-                gulpESLintNew
-                (
-                    {
-                        configType:         'flat',
-                        overrideConfig,
-                        overrideConfigFile: true,
-                        warnIgnored:        true,
-                    },
-                ),
-            )
+            .pipe(gulpESLintNew({ overrideConfig, overrideConfigFile: true, warnIgnored: true }))
             .pipe(gulpESLintNew.format('compact'))
             .pipe(gulpESLintNew.failAfterError());
             return stream;

@@ -20,7 +20,6 @@ export var _JSON_stringify                  = JSON.stringify;
 export var _Math_abs                        = Math.abs;
 export var _Math_max                        = Math.max;
 export var _Math_min                        = Math.min;
-export var _Math_pow                        = Math.pow;
 
 export var _Object                          = Object;
 export var _Object_create                   = _Object.create;
@@ -84,10 +83,7 @@ export function tryCreateRegExp(pattern, flags)
     try
     {
         var regExp = _RegExp(pattern, flags);
-        // In Android Browser 4.0, the RegExp constructor ignores unrecognized flags instead of
-        // throwing a SyntaxError.
-        if (regExp.flags === flags)
-            return regExp;
+        return regExp;
     }
     catch (error)
     { }

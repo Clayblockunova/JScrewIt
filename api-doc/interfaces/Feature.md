@@ -61,7 +61,7 @@ An array of all elementary feature names included in this feature object, withou
 
 ### name?
 
-> `optional` **name**: `string`
+> `optional` **name?**: `string`
 
 The primary name of this feature object, useful for identification purpose.
 
@@ -105,6 +105,8 @@ that require strict mode code, or inside web workers.
 
 ##### environment
 
+`"forced-strict-mode"` \| `"web-worker"`
+
 The environment to which this feature should be restricted.
 Two environments are currently supported.
 
@@ -119,8 +121,6 @@ Removes features that are not available in environments that require strict mode
 <dd>Removes features that are not available inside web workers.</dd>
 
 </dl>
-
-`"forced-strict-mode"` | `"web-worker"`
 
 ##### engineFeatureObjs?
 

@@ -60,7 +60,7 @@ export interface EncodeOptions
      *
      * </dl>
      */
-    runAs?: RunAs | undefined;
+    runAs?: EncodeOptions.RunAs | undefined;
 
     /**
      * If this parameter is truthy, lines in the beginning and in the end of the file containing
@@ -76,16 +76,20 @@ export interface EncodeOptions
     trimCode?: boolean | undefined;
 
     /** An alias for `runAs`. */
-    wrapWith?: RunAs | undefined;
+    wrapWith?: EncodeOptions.RunAs | undefined;
 }
 
-/**
- * Values of this type control the type of code generated from a given input.
- * See {@link EncodeOptions.runAs | `EncodeOptions.runAs`} for the meaning of each possible value.
- */
-type RunAs = 'call' | 'eval' | 'express' | 'express-call' | 'express-eval' | 'none';
+export namespace EncodeOptions
+{
+    /**
+     * Values of this type control the type of code generated from a given input.
+     * See {@link EncodeOptions.runAs | `EncodeOptions.runAs`} for the meaning of each possible
+     * value.
+     */
+    type RunAs = 'call' | 'eval' | 'express' | 'express-call' | 'express-eval' | 'none';
+}
 
-interface encode
+export interface EncodeInterface
 {
     /**
      * Encodes a given string into JSFuck.
@@ -152,5 +156,3 @@ interface encode
      */
     permanentCaching: boolean;
 }
-
-export const encode: encode;

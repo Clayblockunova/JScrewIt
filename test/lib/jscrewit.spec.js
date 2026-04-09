@@ -331,12 +331,12 @@ self,
             );
             emuIt
             (
-                'returns correct JSFuck with features ARRAY_ITERATOR and ATOB',
-                Feature('ARRAY_ITERATOR', 'ATOB'),
+                'returns correct JSFuck with feature ARRAY_ITERATOR',
+                Feature.ARRAY_ITERATOR,
                 function ()
                 {
                     var encoder =
-                    JScrewIt.debug.createEncoder(Feature('ARRAY_ITERATOR', 'ATOB'));
+                    JScrewIt.debug.createEncoder(Feature.ARRAY_ITERATOR);
                     var input = 'The quick brown fox jumps over the lazy dog';
                     var output = encoder._encodeByDict(Object(input), 4);
                     expect(output).toBeJSFuck();
@@ -358,12 +358,12 @@ self,
             );
             emuIt
             (
-                'returns correct JSFuck with feature ARROW, FILL and NO_IE_SRC',
-                Feature('ARROW', 'FILL', 'NO_IE_SRC'),
+                'returns correct JSFuck with feature ARROW, FLAT and NO_IE_SRC',
+                Feature('ARROW', 'FLAT', 'NO_IE_SRC'),
                 function ()
                 {
                     var encoder =
-                    JScrewIt.debug.createEncoder(Feature('ARROW', 'FILL', 'NO_IE_SRC'));
+                    JScrewIt.debug.createEncoder(Feature('ARROW', 'FLAT', 'NO_IE_SRC'));
                     var input = 'Never gonna give you up / Never gonna let you down';
                     var output = encoder._encodeByDict(Object(input), 4);
                     expect(output).toBeJSFuck();
@@ -674,9 +674,7 @@ self,
                 {
                     var encoder = JScrewIt.debug.createEncoder(Feature.FROM_CODE_POINT);
                     var actual = encoder.replaceString('😊', { optimize: true });
-                    var expected =
-                    encoder.replaceExpr
-                    ('Function("return\\"" + ESCAPING_BACKSLASH + "u{1f60a}\\"")()');
+                    var expected = encoder.replaceExpr('Function("return\\"\\\\u{1f60a}\\"")()');
                     expect(actual).toBe(expected);
                 }
             );
@@ -701,16 +699,6 @@ self,
                     var options = { maxLength: 12 };
                     var actual = encoder.replaceString('f', options);
                     expect(actual).toBeUndefined();
-                }
-            );
-            it
-            (
-                'returns undefined for too complex input',
-                function ()
-                {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    encoder.maxGroupThreshold = 2;
-                    expect(encoder.replaceString('123')).toBeUndefined();
                 }
             );
             it.when(typeof module !== 'undefined' && isStickyRegExpSupported())
@@ -887,7 +875,7 @@ self,
                 return result;
             }
 
-            JScrewIt.debug.defineConstant(encoder, 'A', 'FILL');
+            JScrewIt.debug.defineConstant(encoder, 'A', 'FLAT');
             JScrewIt.debug.defineConstant(encoder, 'B', 'C');
             JScrewIt.debug.defineConstant(encoder, 'C', 'B');
             JScrewIt.debug.defineConstant(encoder, 'D', '?');
@@ -925,7 +913,7 @@ self,
                         function ()
                         {
                             expect(debugReplacer('A')).toThrowStrictly
-                            (SyntaxError, 'Undefined identifier FILL in the definition of A');
+                            (SyntaxError, 'Undefined identifier FLAT in the definition of A');
                         }
                     );
                     it
@@ -1104,7 +1092,8 @@ self,
                         featureObj,
                         function ()
                         {
-                            var input = strategy.expressionMode ? JSON.stringify(text) : text;
+                            var input =
+                            strategy.encodingType === 'expression' ? JSON.stringify(text) : text;
                             var output = strategy.call(encoder, Object(input));
                             expect(output).toBeJSFuck();
                             expect(emuEval(this.test.emuFeatureNames, output)).toBe(text);

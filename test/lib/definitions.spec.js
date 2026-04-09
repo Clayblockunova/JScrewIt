@@ -1,18 +1,13 @@
 /* eslint-env ebdd/ebdd */
 /*
 global
-Audio,
 Intl,
-Node,
-atob,
-btoa,
 document,
 emuDo,
 emuIt,
 evalJSFuck,
 expect,
 getEmuFeatureNames,
-location,
 module,
 require,
 self,
@@ -74,29 +69,6 @@ self,
 
     function testCharacter(charCode)
     {
-        function testAtob()
-        {
-            if (charCode < 0x100)
-            {
-                emuIt
-                (
-                    '(atob)',
-                    Feature.ATOB,
-                    function ()
-                    {
-                        var encoder = getPoolEncoder(Feature.ATOB);
-                        var solution =
-                        encoder._createCharDefaultSolution
-                        (char, charCode, true, false, false, false);
-                        verifyStringSolution(solution, char, this.test.emuFeatureNames);
-                        var defaultSolutionLength =
-                        getPoolEncoder(Feature.DEFAULT).resolveCharacter(char).length;
-                        expect(solution.length).not.toBeGreaterThan(defaultSolutionLength);
-                    }
-                );
-            }
-        }
-
         function testDefault()
         {
             it
@@ -139,8 +111,6 @@ self,
             var featureObj = getEntryFeature(entry);
             if (Feature.DEFAULT.includes(featureObj))
                 defaultEntryFound = true;
-            if (Feature.ATOB.includes(featureObj))
-                atobEntryFound = true;
             emuIt
             (
                 '(definition ' + index + ')',
@@ -220,7 +190,6 @@ self,
             [],
             ['AT'],
             ['FF_SRC'],
-            ['FILL'],
             ['FLAT'],
             ['IE_SRC'],
             ['INCR_CHAR'],
@@ -235,14 +204,7 @@ self,
             ['AT', 'NO_IE_SRC'],
             ['AT', 'NO_V8_SRC'],
             ['AT', 'V8_SRC'],
-            ['FF_SRC', 'FILL'],
             ['FF_SRC', 'FLAT'],
-            ['FILL', 'IE_SRC'],
-            ['FILL', 'INCR_CHAR'],
-            ['FILL', 'NO_FF_SRC'],
-            ['FILL', 'NO_IE_SRC'],
-            ['FILL', 'NO_V8_SRC'],
-            ['FILL', 'V8_SRC'],
             ['FLAT', 'IE_SRC'],
             ['FLAT', 'INCR_CHAR'],
             ['FLAT', 'NO_FF_SRC'],
@@ -255,9 +217,6 @@ self,
             ['AT', 'INCR_CHAR', 'NO_FF_SRC'],
             ['AT', 'INCR_CHAR', 'NO_IE_SRC'],
             ['AT', 'INCR_CHAR', 'NO_V8_SRC'],
-            ['FILL', 'INCR_CHAR', 'NO_FF_SRC'],
-            ['FILL', 'INCR_CHAR', 'NO_IE_SRC'],
-            ['FILL', 'INCR_CHAR', 'NO_V8_SRC'],
             ['FLAT', 'INCR_CHAR', 'NO_FF_SRC'],
             ['FLAT', 'INCR_CHAR', 'NO_IE_SRC'],
             ['FLAT', 'INCR_CHAR', 'NO_V8_SRC'],
@@ -269,7 +228,6 @@ self,
         [
             [],
             ['AT'],
-            ['FILL'],
             ['FLAT'],
             ['IE_SRC'],
             ['INCR_CHAR'],
@@ -277,9 +235,6 @@ self,
             ['AT', 'IE_SRC'],
             ['AT', 'INCR_CHAR'],
             ['AT', 'NO_IE_SRC'],
-            ['FILL', 'IE_SRC'],
-            ['FILL', 'INCR_CHAR'],
-            ['FILL', 'NO_IE_SRC'],
             ['FLAT', 'IE_SRC'],
             ['FLAT', 'INCR_CHAR'],
             ['FLAT', 'NO_IE_SRC'],
@@ -292,19 +247,13 @@ self,
         if (entries)
         {
             var defaultEntryFound = false;
-            var atobEntryFound = false;
             if (entries)
                 entries.forEach(testEntry);
             if (!defaultEntryFound)
                 testDefault();
-            if (!atobEntryFound)
-                testAtob();
         }
         else
-        {
             testDefault();
-            testAtob();
-        }
     }
 
     function testComplex(complex)
@@ -457,49 +406,23 @@ self,
             var paramDataMap =
             {
                 Array:      isExpected(Array),
-                Audio:
-                function ()
-                {
-                    this.toBe(Audio);
-                },
                 Boolean:    isExpected(Boolean),
-                Date:       isExpected(Date),
                 Function:   isExpected(Function),
                 Intl:
                 function ()
                 {
                     this.toBe(Intl);
                 },
-                Node:
-                function ()
-                {
-                    this.toBe(Node);
-                },
                 Number:     isExpected(Number),
                 Object:     isExpected(Object),
                 RegExp:     isExpected(RegExp),
                 String:     isExpected(String),
-                atob:
-                function ()
-                {
-                    this.toBe(atob);
-                },
-                btoa:
-                function ()
-                {
-                    this.toBe(btoa);
-                },
                 document:
                 function ()
                 {
                     this.toBe(document);
                 },
                 escape:     isExpected(escape),
-                location:
-                function ()
-                {
-                    this.toBe(location);
-                },
                 self:
                 function ()
                 {
@@ -521,16 +444,6 @@ self,
                 function ()
                 {
                     this.toBe(Array.prototype.at);
-                },
-                ESCAPING_BACKSLASH:
-                function ()
-                {
-                    this.toBe('\\');
-                },
-                FILL:
-                function ()
-                {
-                    this.toBe(Array.prototype.fill);
                 },
                 FILTER:
                 function ()
@@ -556,11 +469,6 @@ self,
                 function ()
                 {
                     this.toMatch(/^ar(-td)?$/);
-                },
-                LOCATION_CONSTRUCTOR:
-                function ()
-                {
-                    this.toBe(location.constructor);
                 },
                 PLAIN_OBJECT:
                 function ()

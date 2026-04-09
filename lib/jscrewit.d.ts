@@ -1,16 +1,16 @@
 // Type definitions for JScrewIt
 
-import type { encode }  from './encode';
-import type { Feature } from './feature';
+import type { EncodeInterface }     from './encode';
+import type { FeatureConstructor }  from './feature';
 
-export *        from './encode';
-export *        from './feature';
+export type *   from './encode';
+export type *   from './feature';
 export type *   from './feature-all';
 
 interface JScrewIt
 {
-    Feature:    typeof Feature;
-    encode:     typeof encode;
+    Feature:    FeatureConstructor;
+    encode:     EncodeInterface;
 }
 
 declare global
