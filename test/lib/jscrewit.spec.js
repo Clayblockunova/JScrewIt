@@ -747,22 +747,32 @@ self,
             );
             it
             (
-                'replaces element "" without string forcing',
+                'replaces an empty string element without string forcing',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output = encoder.replaceStringArray(['', ''], [], null, false);
+                    var output = encoder.replaceStringArray(['', ''], [], null, false, false);
                     expect(evalJSFuck(output)).toEqual([[], []]);
                 }
             );
             it
             (
-                'replaces element "" with string forcing',
+                'replaces an empty string element with string forcing',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output = encoder.replaceStringArray([''], [], null, true);
+                    var output = encoder.replaceStringArray([''], [], null, false, true);
                     expect(output).toBe('[[]+[]]');
+                }
+            );
+            it
+            (
+                'replaces empty string elements with the concat approach',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder('COMPACT');
+                    var output = encoder.replaceStringArray(['', '', ''], [], null, true, false);
+                    expect(evalJSFuck(output)).toEqual([[], 0, 0]);
                 }
             );
             it
@@ -809,10 +819,30 @@ self,
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output =
+                    var replaceString = encoder.replaceString;
+                    var splitReplacement = null;
+                    var concatReplacement = null;
+                    encoder.replaceString =
+                    function (str)
+                    {
+                        var replaceResult = replaceString.apply(this, arguments);
+                        if (str === 'split')
+                            splitReplacement = replaceResult;
+                        else if (str === 'concat')
+                            concatReplacement = replaceResult;
+                        return replaceResult;
+                    };
                     encoder.replaceStringArray
-                    (['', '', '', ''], [{ separator: 'false', joiner: 'false' }], null, false, 0);
-                    expect(output).toBeUndefined();
+                    (
+                        ['', '', '', ''],
+                        [{ separator: 'false', joiner: 'false' }],
+                        null,
+                        false,
+                        false,
+                        0
+                    );
+                    expect(splitReplacement).toBeUndefined();
+                    expect(concatReplacement).toBeUndefined();
                 }
             );
             it
@@ -821,27 +851,44 @@ self,
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output =
+                    var replaceString = encoder.replaceString;
+                    var joinReplacement = null;
+                    encoder.replaceString =
+                    function (str)
+                    {
+                        var replaceResult = replaceString.apply(this, arguments);
+                        if (str === 'join')
+                            joinReplacement = replaceResult;
+                        return replaceResult;
+                    };
                     encoder.replaceStringArray
                     (
                         [''],
                         [{ separator: 'false', joiner: 'false' }],
                         [{ separator: '0', joiner: '1' }],
                         false,
+                        false,
                         7000
                     );
-                    expect(output).toBeUndefined();
+                    expect(joinReplacement).toBeUndefined();
                 }
             );
             it
             (
-                'does not replace a joined string when maxLength is low',
+                'does not replace the input when maxLength is low',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
                     var output =
                     encoder.replaceStringArray
-                    (repeat('0', 50).split(''), [{ separator: '[]', joiner: '' }], [], false, 3500);
+                    (
+                        repeat('0', 50).split(''),
+                        [{ separator: '[]', joiner: '' }],
+                        [],
+                        false,
+                        false,
+                        3500
+                    );
                     expect(output).toBeUndefined();
                 }
             );
@@ -851,7 +898,7 @@ self,
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output = encoder.replaceStringArray([''], [], null, false, 0);
+                    var output = encoder.replaceStringArray([''], [], null, false, false, 0);
                     expect(output).toBeUndefined();
                 }
             );

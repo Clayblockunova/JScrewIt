@@ -126,7 +126,7 @@ function callStrategies(encoder, input, options, strategyNames, unitPath)
 }
 
 function createCharKeyArrayString
-(encoder, input, charMap, insertions, substitutions, forceString, maxLength)
+(encoder, input, charMap, insertions, substitutions, areKeysFigures, maxLength)
 {
     var charKeyArray =
     _Array_prototype_map_call
@@ -139,7 +139,8 @@ function createCharKeyArrayString
         }
     );
     var charKeyArrayStr =
-    encoder.replaceStringArray(charKeyArray, insertions, substitutions, forceString, maxLength);
+    encoder.replaceStringArray
+    (charKeyArray, insertions, substitutions, !areKeysFigures, areKeysFigures, maxLength);
     return charKeyArrayStr;
 }
 
@@ -325,10 +326,17 @@ function encodeByDblDict
     var figureMaxLength = maxLength - legend.length;
     var figureLegend =
     encoder.replaceStringArray
-    (figures, figureLegendInsertions, null, true, figureMaxLength - minCharIndexArrayStrLength);
+    (
+        figures,
+        figureLegendInsertions,
+        null,
+        false,
+        true,
+        figureMaxLength - minCharIndexArrayStrLength
+    );
     if (!figureLegend)
         return;
-    var keyFigureArrayStr =
+    var charFigureArrayStr =
     createCharKeyArrayString
     (
         encoder,
@@ -339,14 +347,14 @@ function encodeByDblDict
         true,
         figureMaxLength - figureLegend.length
     );
-    if (!keyFigureArrayStr)
+    if (!charFigureArrayStr)
         return;
     var formatter = encoder.findDefinition(MAPPER_FORMATTER);
     var argName = 'undefined';
     var accessor = '.indexOf(' + argName + ')';
     var mapper = formatter(argName, accessor);
     var charIndexArrayStr =
-    createJSFuckArrayMapping(encoder, keyFigureArrayStr, mapper, figureLegend);
+    createJSFuckArrayMapping(encoder, charFigureArrayStr, mapper, figureLegend);
     var output = encoder.createDictEncoding(legend, charIndexArrayStr, maxLength);
     return output;
 }
@@ -639,15 +647,15 @@ var falseTrueFigurator = createFigurator(['false', 'true'], '');
 
         /* -------------------------------------------------------------------------------------- *\
 
-        Encodes "NINE" as:
+        Encodes "FIFTY" as:
 
-        "false2falsefalse1".split(false).map("".charAt.bind("NEI")).join([])
+        "false1falsefalse2false3".split(false).map("".charAt.bind("FITY")).join([])
 
         (split strategy)
 
         Or:
 
-        [0].concat(2).concat(0).concat(1).map("".charAt.bind("NEI")).join([])
+        [[]].concat(1).concat(0).concat(2).concat(3).map("".charAt.bind("FITY")).join([])
 
         (concat strategy)
 
@@ -1189,7 +1197,7 @@ assignNoEnum
         function (array, maxLength)
         {
             var result =
-            this.replaceStringArray(array, [FALSE_FREE_DELIMITER], null, false, maxLength);
+            this.replaceStringArray(array, [FALSE_FREE_DELIMITER], null, false, false, maxLength);
             return result;
         },
 
@@ -1211,7 +1219,7 @@ assignNoEnum
          * An express-parsable expression used as an argument for `String.prototype.split` to split
          * a string into an array of strings.
          *
-         * @property {number} joiner
+         * @property {string} joiner
          * The joiner can be any string. A joiner is inserted between adjacent strings in an array
          * in order to join them into a single string.
          */
@@ -1245,6 +1253,9 @@ assignNoEnum
          * certain optimizations for short arrays to be made. To allow all optimizations to be
          * performed, omit this argument or set it to null instead of specifying an empty array.
          *
+         * @param {boolean} [allowZeroForEmptyElements=false]
+         * Indicates whether empty string elements in the input array may be replaced with zeros.
+         *
          * @param {boolean} [forceString=false]
          * Indicates whether the elements in the replacement expression should evaluate to strings.
          *
@@ -1253,7 +1264,8 @@ assignNoEnum
          *
          * Regardless of this argument, the string representation of the value of the whole
          * replacement expression will be always the same as the string representation of the input
-         * array.
+         * array after applying substitutions (including optional empty string to zero replacements)
+         * to its elements.
          *
          * @param {number} [maxLength=(NaN)]
          * The maximum length of the replacement expression.
@@ -1267,13 +1279,14 @@ assignNoEnum
          * The replacement string or `undefined`.
          */
         replaceStringArray:
-        function (array, insertions, substitutions, forceString, maxLength)
+        function
+        (array, insertions, substitutions, allowZeroForEmptyElements, forceString, maxLength)
         {
             var replacement;
             var count = array.length;
-            // Don't even try the split approach for 3 or less elements if the concat approach can
+            // Don't even try the split approach for two or less elements if the concat approach can
             // be applied.
-            if (substitutions || count > 3)
+            if (substitutions || count > 2)
             {
                 var preReplacement =
                 function ()
@@ -1400,7 +1413,7 @@ assignNoEnum
                             if (arrayReplacement)
                             {
                                 if (elementReplacement === '[]')
-                                    elementReplacement = '[[]]';
+                                    elementReplacement = allowZeroForEmptyElements ? '+[]' : '[[]]';
                                 arrayReplacement +=
                                 '[' + concatReplacement + '](' + elementReplacement + ')';
                             }
