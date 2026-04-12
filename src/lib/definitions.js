@@ -361,7 +361,6 @@ function getFHPaddingEntries(index)
     var LOCALE_NUMERALS_EXT             = Feature.LOCALE_NUMERALS_EXT;
     var LOCALE_NUMERALS_IE11_WIN7       = Feature.LOCALE_NUMERALS_IE11_WIN7;
     var LOCALE_NUMERALS_IE11_WIN7_8     = Feature.LOCALE_NUMERALS_IE11_WIN7_8;
-    var RUSSIAN_INFINITY                = Feature.RUSSIAN_INFINITY;
     var NAME                            = Feature.NAME;
     var NO_FF_SRC                       = Feature.NO_FF_SRC;
     var NO_IE_SRC                       = Feature.NO_IE_SRC;
@@ -370,6 +369,7 @@ function getFHPaddingEntries(index)
     var OBJECT_W_SELF                   = Feature.OBJECT_W_SELF;
     var PLAIN_INTL                      = Feature.PLAIN_INTL;
     var REGEXP_STRING_ITERATOR          = Feature.REGEXP_STRING_ITERATOR;
+    var RUSSIAN_INFINITY                = Feature.RUSSIAN_INFINITY;
     var SELF                            = Feature.SELF;
     var SHORT_LOCALES                   = Feature.SHORT_LOCALES;
     var STATUS                          = Feature.STATUS;
