@@ -786,7 +786,7 @@
                     switch (locale)
                     {
                     case 'lv':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             return 'bezgalība';
@@ -795,7 +795,7 @@
                         }
                         break;
                     case 'ru':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             return 'бесконечность';
@@ -853,7 +853,7 @@
                             returnValue = '-∞';
                         break;
                     case 'lt':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             returnValue = 'begalybė';
@@ -864,7 +864,7 @@
                         }
                         break;
                     case 'pl':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             returnValue = '+nieskończoność';
@@ -875,7 +875,7 @@
                         }
                         break;
                     case 'zh':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             returnValue = '正无穷大';
@@ -951,7 +951,7 @@
                     switch (locale)
                     {
                     case 'ru':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        switch (this)
                         {
                         case Infinity:
                             return '∞';
