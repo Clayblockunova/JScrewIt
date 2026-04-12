@@ -894,38 +894,6 @@
                 }
             );
         },
-        LOCALE_NUMERALS_IE11_WIN8:
-        function ()
-        {
-            registerNumberToLocaleStringAdapter
-            (
-                this,
-                function (locale)
-                {
-                    switch (locale)
-                    {
-                    case 'lv':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
-                        {
-                        case Infinity:
-                            return '∞';
-                        case -Infinity:
-                            return '-∞';
-                        }
-                        break;
-                    case 'ru':
-                        switch (+this) // In Internet Explorer 9, +this is different from this.
-                        {
-                        case Infinity:
-                            return '∞';
-                        case -Infinity:
-                            return '-∞';
-                        }
-                        break;
-                    }
-                }
-            );
-        },
         NAME:
         function ()
         {
@@ -972,6 +940,29 @@
                 registerDefaultToStringAdapter(this, Intl, '[object Object]');
         },
         REGEXP_STRING_ITERATOR: makeEmuFeatureMatchAll(),
+        RUSSIAN_INFINITY:
+        function ()
+        {
+            registerNumberToLocaleStringAdapter
+            (
+                this,
+                function (locale)
+                {
+                    switch (locale)
+                    {
+                    case 'ru':
+                        switch (+this) // In Internet Explorer 9, +this is different from this.
+                        {
+                        case Infinity:
+                            return '∞';
+                        case -Infinity:
+                            return '-∞';
+                        }
+                        break;
+                    }
+                }
+            );
+        },
         SELF:                   makeEmuFeatureSelf('[object Object]', /^\[object /),
         SHORT_LOCALES:
         function ()

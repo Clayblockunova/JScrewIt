@@ -361,7 +361,7 @@ function getFHPaddingEntries(index)
     var LOCALE_NUMERALS_EXT             = Feature.LOCALE_NUMERALS_EXT;
     var LOCALE_NUMERALS_IE11_WIN7       = Feature.LOCALE_NUMERALS_IE11_WIN7;
     var LOCALE_NUMERALS_IE11_WIN7_8     = Feature.LOCALE_NUMERALS_IE11_WIN7_8;
-    var LOCALE_NUMERALS_IE11_WIN8       = Feature.LOCALE_NUMERALS_IE11_WIN8;
+    var RUSSIAN_INFINITY                = Feature.RUSSIAN_INFINITY;
     var NAME                            = Feature.NAME;
     var NO_FF_SRC                       = Feature.NO_FF_SRC;
     var NO_IE_SRC                       = Feature.NO_IE_SRC;
@@ -1082,7 +1082,7 @@ function getFHPaddingEntries(index)
             define('Infinity[TO_LOCALE_STRING]("ja").at("-1")', AT),
             define('Infinity[TO_LOCALE_STRING]()', LOCALE_INFINITY),
             define('Infinity[TO_LOCALE_STRING]("ja")[1]', LOCALE_NUMERALS_IE11_WIN7_8),
-            define('Infinity[TO_LOCALE_STRING]("ru")', LOCALE_NUMERALS_IE11_WIN8),
+            define('Infinity[TO_LOCALE_STRING]("ru")', RUSSIAN_INFINITY),
             defineCharDefault(),
         ],
     }); // eslint-disable-line @origin-1/bracket-layout

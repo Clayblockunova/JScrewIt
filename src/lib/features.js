@@ -370,19 +370,6 @@ var featureInfos =
             return available;
         },
     },
-    LOCALE_NUMERALS_IE11_WIN8:
-    {
-        description:
-        'Localized number formatting exclusive to Interner Explorer 11 in Windows 8.\n' +
-        'In this case, Latvian and Russian string representation of Infinity are both "∞".',
-        check:
-        function ()
-        {
-            var available = Infinity.toLocaleString('lv') === '∞' &&
-            Infinity.toLocaleString('ru') === '∞';
-            return available;
-        },
-    },
     NAME:
     {
         description: 'Existence of the name property for functions.',
@@ -480,6 +467,16 @@ var featureInfos =
             return available;
         },
     },
+    RUSSIAN_INFINITY:
+    {
+        description:'Russian string representation of Infinity as "∞".',
+        check:
+        function ()
+        {
+            var available = Infinity.toLocaleString('ru') === '∞';
+            return available;
+        },
+    },
     SELF:
     {
         description:
@@ -573,6 +570,7 @@ var featureInfos =
             'NAME',
             'NO_IE_SRC',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'STATUS',
             'WINDOW',
         ],
@@ -615,6 +613,7 @@ var featureInfos =
             'LOCALE_NUMERALS_EXT',
             'NAME',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'STATUS',
             'V8_SRC',
             'WINDOW',
@@ -665,6 +664,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'STATUS',
             'WINDOW',
@@ -715,7 +715,7 @@ var featureInfos =
         compatibilityTag:       'on Windows 8',
         compatibilityShortTag:  'W8',
         includes:
-        { LOCALE_NUMERALS_IE11_WIN7: false, LOCALE_NUMERALS_IE11_WIN8: true },
+        { LOCALE_NUMERALS_IE11_WIN7: false, RUSSIAN_INFINITY: true },
     },
     IE_11_WIN_10:
     {
@@ -729,7 +729,6 @@ var featureInfos =
             LOCALE_NUMERALS_BN:          true,
             LOCALE_NUMERALS_EXT:         true,
             LOCALE_NUMERALS_IE11_WIN7_8: false,
-            LOCALE_NUMERALS_IE11_WIN8:   false,
         },
     },
     NODE_20:
@@ -752,6 +751,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'V8_SRC',
         ],
@@ -797,6 +797,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'STATUS',
             'WINDOW',
