@@ -469,7 +469,7 @@ var featureInfos =
     },
     RUSSIAN_INFINITY:
     {
-        description: 'Russian string representation of Infinity as "∞".', 
+        description: 'Russian string representation of Infinity as "∞".',
         check:
         function ()
         {
