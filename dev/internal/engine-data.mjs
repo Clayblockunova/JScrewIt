@@ -1,5 +1,8 @@
 import { Feature } from '../../lib/jscrewit.js';
 
+const AND_FORMATTER = new Intl.ListFormat('en');
+const OR_FORMATTER  = new Intl.ListFormat('en', { type: 'disjunction' });
+
 const availabilityInfoMap = { __proto__: null };
 
 export function calculateAvailabilityInfo(family, filterFeature)
@@ -47,7 +50,11 @@ export function getDescription(compatibilities, compatibilityIndex, appendPlus)
         description += ` and ${typeof lastVersion === 'string' ? lastVersion : lastVersion.from}`;
     }
     if (tag != null)
-        description += ` ${tag}`;
+    {
+        const availableCompatibilities = compatibilities.slice(compatibilityIndex);
+        const tags = availableCompatibilities.map(({ tag }) => tag).filter(tag => tag != null);
+        description += ` ${joinWithAnd(tags)}`;
+    }
     if (appendPlus && !isLastVersion(compatibilities, compatibilityIndex))
         description += '+';
     return description;
@@ -78,4 +85,16 @@ function isOldAndLatestVersion(versions)
     if (versions.length === 1) return false;
     const lastVersion = versions.at(-1);
     return typeof lastVersion !== 'string' && lastVersion.to == null;
+}
+
+export function joinWithAnd(array)
+{
+    const returnValue = AND_FORMATTER.format(array);
+    return returnValue;
+}
+
+export function joinWithOr(array)
+{
+    const returnValue = OR_FORMATTER.format(array);
+    return returnValue;
 }

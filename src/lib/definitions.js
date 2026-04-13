@@ -367,6 +367,7 @@ function getFHPaddingEntries(index)
     var OBJECT_W_SELF                   = Feature.OBJECT_W_SELF;
     var PLAIN_INTL                      = Feature.PLAIN_INTL;
     var REGEXP_STRING_ITERATOR          = Feature.REGEXP_STRING_ITERATOR;
+    var RUSSIAN_INFINITY                = Feature.RUSSIAN_INFINITY;
     var SELF                            = Feature.SELF;
     var SHORT_LOCALES                   = Feature.SHORT_LOCALES;
     var STATUS                          = Feature.STATUS;
@@ -1076,6 +1077,7 @@ function getFHPaddingEntries(index)
             define('Infinity[TO_LOCALE_STRING]("ja")[SLICE_OR_SUBSTR]("-1")'),
             define('Infinity[TO_LOCALE_STRING]("ja").at("-1")', AT),
             define('Infinity[TO_LOCALE_STRING]()', LOCALE_INFINITY),
+            define('Infinity[TO_LOCALE_STRING]("ru")', RUSSIAN_INFINITY),
             defineCharDefault(),
         ],
     }); // eslint-disable-line @origin-1/bracket-layout

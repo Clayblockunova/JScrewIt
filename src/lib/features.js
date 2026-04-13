@@ -417,6 +417,16 @@ var featureInfos =
             return available;
         },
     },
+    RUSSIAN_INFINITY:
+    {
+        description: 'Russian string representation of Infinity as "∞".',
+        check:
+        function ()
+        {
+            var available = Infinity.toLocaleString('ru') === '∞';
+            return available;
+        },
+    },
     SELF:
     {
         description:
@@ -510,6 +520,7 @@ var featureInfos =
             'NAME',
             'NO_IE_SRC',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'STATUS',
             'WINDOW',
         ],
@@ -552,6 +563,7 @@ var featureInfos =
             'LOCALE_NUMERALS_EXT',
             'NAME',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'STATUS',
             'V8_SRC',
             'WINDOW',
@@ -602,6 +614,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'STATUS',
             'WINDOW',
@@ -645,6 +658,14 @@ var featureInfos =
         ],
         attributes: { 'char-increment-restriction': null, 'web-worker-restriction': null },
     },
+    IE_11_WIN_8:
+    {
+        inherits:               'IE_11',
+        versions:               ['11'],
+        compatibilityTag:       'on Windows 8',
+        compatibilityShortTag:  'W8',
+        includes:               { RUSSIAN_INFINITY: true },
+    },
     IE_11_WIN_10:
     {
         inherits:               'IE_11',
@@ -656,6 +677,7 @@ var featureInfos =
             LOCALE_INFINITY:        true,
             LOCALE_NUMERALS_BN:     true,
             LOCALE_NUMERALS_EXT:    true,
+            RUSSIAN_INFINITY:       true,
         },
     },
     NODE_20:
@@ -678,6 +700,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'V8_SRC',
         ],
@@ -723,6 +746,7 @@ var featureInfos =
             'NAME',
             'OBJECT_ARRAY_ENTRIES_CTOR',
             'REGEXP_STRING_ITERATOR',
+            'RUSSIAN_INFINITY',
             'SHORT_LOCALES',
             'STATUS',
             'WINDOW',
