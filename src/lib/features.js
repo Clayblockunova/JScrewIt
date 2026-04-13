@@ -291,6 +291,8 @@ var featureInfos =
             var available = Infinity.toLocaleString() === '∞';
             return available;
         },
+        includes:    ['RUSSIAN_INFINITY'],
+        excludes:    ['LOCALE_NUMERALS_IE11_WIN7_8'],
     },
     LOCALE_NUMERALS_BN:
     {
@@ -334,6 +336,7 @@ var featureInfos =
             checkLocaleNumeral('ru', Infinity, /^бесконечность/);
             return available;
         },
+        excludes: ['RUSSIAN_INFINITY'],
     },
     LOCALE_NUMERALS_IE11_WIN7_8:
     {
@@ -369,6 +372,7 @@ var featureInfos =
             checkLocaleNumeral('zh-cn', NaN, /^非数字/);
             return available;
         },
+        excludes: ['LOCALE_INFINITY'],
     },
     NAME:
     {
@@ -476,6 +480,7 @@ var featureInfos =
             var available = Infinity.toLocaleString('ru') === '∞';
             return available;
         },
+        excludes:    ['LOCALE_NUMERALS_IE11_WIN7'],
     },
     SELF:
     {
