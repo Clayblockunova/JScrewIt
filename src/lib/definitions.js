@@ -657,10 +657,7 @@ function getFHPaddingEntries(index)
             defineCharInFnHead(13, NO_V8_SRC),
         ],
         // '\x0b'…'\x1d'
-        '\x1e':
-        [
-            define('(RP_5_A + atob("NaNfalse"))[10]'),
-        ],
+        '\x1e': '(RP_5_A + atob("NaNfalse"))[10]',
         // '\x1f'
         ' ':
         [
@@ -677,14 +674,8 @@ function getFHPaddingEntries(index)
             define('(RP_0_S + FLAT)[20]', FLAT, NO_V8_SRC),
         ],
         // '!'
-        '"':
-        [
-            define('"".fontcolor()[12]'),
-        ],
-        '#':
-        [
-            defineCharDefault(),
-        ],
+        '"':    '"".fontcolor()[12]',
+        // '#'
         // '$'
         '%':
         [
@@ -709,14 +700,14 @@ function getFHPaddingEntries(index)
             defineCharInFnHead(10),
         ],
         // '*'
-        '+': '(1e100 + [])[2]',
+        '+':    '(1e100 + [])[2]',
         ',':
         [
             define('(RP_0_S + F_A_L_S_E)[1]'),
             define({ expr: '[[]].concat([[]])', solutionType: SolutionType.OBJECT }),
         ],
-        '-': '(.0000001 + [])[2]',
-        '.': '(11e20 + [])[1]',
+        '-':    '(.0000001 + [])[2]',
+        '.':    '(11e20 + [])[1]',
         '/':
         [
             define('"0false".italics()[10]'),
@@ -727,16 +718,14 @@ function getFHPaddingEntries(index)
         ';':
         [
             define('"".fontcolor("".fontcolor())[30]', ESC_HTML_QUOT),
+            defineCharDefault(),
         ],
         '<':
         [
             define('"".italics()[0]'),
             define('"".sub()[0]'),
         ],
-        '=':
-        [
-            define('"".fontcolor()[11]'),
-        ],
+        '=':    '"".fontcolor()[11]',
         '>':
         [
             define('"".italics()[2]'),
@@ -800,11 +789,8 @@ function getFHPaddingEntries(index)
             define('"".link()[3]', CAPITAL_HTML),
             define('(RP_4_A + [].entries().filter(ANY_FUNCTION))[21]', ITERATOR_HELPER),
         ],
-        'I': '"Infinity"[0]',
-        'J':
-        [
-            define('btoa(true)[2]'),
-        ],
+        'I':    '"Infinity"[0]',
+        'J':    'btoa(true)[2]',
         'K':
         [
             define('(RP_5_A + "".strike())[10]', CAPITAL_HTML),
@@ -820,7 +806,7 @@ function getFHPaddingEntries(index)
             define('btoa(0)[0]'),
             define('"".small()[2]', CAPITAL_HTML),
         ],
-        'N': '"NaN"[0]',
+        'N':    '"NaN"[0]',
         'O':
         [
             defineCharInFn('Object', 9),
@@ -836,10 +822,7 @@ function getFHPaddingEntries(index)
             define('"0".sup()[10]', CAPITAL_HTML),
             defineCharDefault(),
         ],
-        'Q':
-        [
-            define('btoa(1)[1]'),
-        ],
+        'Q':    'btoa(1)[1]',
         'R':
         [
             define('btoa("0true")[2]'),
@@ -860,27 +843,15 @@ function getFHPaddingEntries(index)
             define('btoa("1NaN")[1]'),
             define('"".sub()[2]', CAPITAL_HTML),
         ],
-        'V':
-        [
-            define('btoa(undefined)[10]'),
-        ],
+        'V':    'btoa(undefined)[10]',
         'W':
         [
             define('btoa(undefined)[1]'),
             define('(RP_3_WA + self)[11]', OBJECT_W_SELF),
         ],
-        'X':
-        [
-            define('btoa("1true")[1]'),
-        ],
-        'Y':
-        [
-            define('btoa("a")[0]'),
-        ],
-        'Z':
-        [
-            define('btoa(false)[0]'),
-        ],
+        'X':    'btoa("1true")[1]',
+        'Y':    'btoa("a")[0]',
+        'Z':    'btoa(false)[0]',
         '[':
         [
             defineCharInFnBody(14),
@@ -892,13 +863,10 @@ function getFHPaddingEntries(index)
             defineCharInFnBody(26),
             define('(RP_0_S + ARRAY_ITERATOR)[22]', ARRAY_ITERATOR),
         ],
-        '^':
-        [
-            define('atob("undefined0")[2]'),
-        ],
+        '^':    'atob("undefined0")[2]',
         // '_'
         // '`'
-        'a': '"false"[1]',
+        'a':    '"false"[1]',
         'b':
         [
             defineCharInFn('Number', 12),
@@ -909,9 +877,9 @@ function getFHPaddingEntries(index)
             defineCharInFn('ANY_FUNCTION', 3),
             define('(RP_5_A + ARRAY_ITERATOR)[10]', ARRAY_ITERATOR),
         ],
-        'd': '"undefined"[2]',
-        'e': '"true"[3]',
-        'f': '"false"[0]',
+        'd':    '"undefined"[2]',
+        'e':    '"true"[3]',
+        'f':    '"false"[0]',
         'g':
         [
             defineCharInFn('String', 14),
@@ -921,7 +889,7 @@ function getFHPaddingEntries(index)
             define('btoa("0false")[3]'),
             define('101[TO_STRING]("21")[1]'),
         ],
-        'i': '([RP_5_A] + undefined)[10]',
+        'i':    '([RP_5_A] + undefined)[10]',
         'j':
         [
             define('(RP_0_S + Intl)[3]'),
@@ -935,13 +903,13 @@ function getFHPaddingEntries(index)
             define('20[TO_STRING]("21")'),
             defineCharDefault(),
         ],
-        'l': '"false"[2]',
+        'l':    '"false"[2]',
         'm':
         [
             defineCharInFn('Number', 11),
             define('(RP_6_S + Function())[20]'),
         ],
-        'n': '"undefined"[1]',
+        'n':    '"undefined"[1]',
         'o':
         [
             defineCharInFn('ANY_FUNCTION', 6),
@@ -959,10 +927,10 @@ function getFHPaddingEntries(index)
             define('"".fontcolor(true + "".fontcolor())[30]', ESC_HTML_QUOT),
             defineCharDefault(),
         ],
-        'r': '"true"[1]',
-        's': '"false"[3]',
-        't': '"true"[0]',
-        'u': '"undefined"[0]',
+        'r':    '"true"[1]',
+        's':    '"false"[3]',
+        't':    '"true"[0]',
+        'u':    '"undefined"[0]',
         'v':
         [
             defineCharInFnBody(19),
@@ -978,7 +946,7 @@ function getFHPaddingEntries(index)
             define('btoa("falsefalse")[10]'),
             define('101[TO_STRING]("34")[1]'),
         ],
-        'y': '(RP_3_WA + [Infinity])[10]',
+        'y':    '(RP_3_WA + [Infinity])[10]',
         'z':
         [
             define('35[TO_STRING]("36")'),
@@ -996,86 +964,26 @@ function getFHPaddingEntries(index)
         // '~'
         // '\x7f'
 
-        '\x8a':
-        [
-            define('(RP_4_A + atob("NaNundefined"))[10]'),
-        ],
-        '\x8d':
-        [
-            define('atob("0NaN")[2]'),
-        ],
-        '\x96':
-        [
-            define('atob("00false")[3]'),
-        ],
-        '\x9e':
-        [
-            define('atob(true)[2]'),
-        ],
-        '£':
-        [
-            define('atob(NaN)[1]'),
-        ],
-        '¥':
-        [
-            define('atob("0false")[2]'),
-        ],
-        '§':
-        [
-            define('atob("00undefined")[2]'),
-        ],
-        '©':
-        [
-            define('atob("false0")[1]'),
-        ],
-        '±':
-        [
-            define('atob("0false")[3]'),
-        ],
-        '¶':
-        [
-            define('atob(true)[0]'),
-        ],
-        'º':
-        [
-            define('atob("undefined0")[0]'),
-        ],
-        '»':
-        [
-            define('atob(true)[1]'),
-        ],
-        'Ç':
-        [
-            define('atob("falsefalsefalse")[10]'),
-        ],
-        'Ú':
-        [
-            define('atob("0truefalse")[1]'),
-        ],
-        'Ý':
-        [
-            define('atob("0undefined")[2]'),
-        ],
-        'â':
-        [
-            define('atob("falsefalseundefined")[11]'),
-        ],
-        'é':
-        [
-            define('atob("0undefined")[1]'),
-        ],
-        'î':
-        [
-            define('atob("0truefalse")[2]'),
-        ],
-        'ö':
-        [
-            define('atob("0false")[1]'),
-        ],
-        'ø':
-        [
-            define('atob("undefinedundefined")[10]'),
-        ],
+        '\x8a': '(RP_4_A + atob("NaNundefined"))[10]',
+        '\x8d': 'atob("0NaN")[2]',
+        '\x96': 'atob("00false")[3]',
+        '\x9e': 'atob(true)[2]',
+        '£':    'atob(NaN)[1]',
+        '¥':    'atob("0false")[2]',
+        '§':    'atob("00undefined")[2]',
+        '©':    'atob("false0")[1]',
+        '±':    'atob("0false")[3]',
+        '¶':    'atob(true)[0]',
+        'º':    'atob("undefined0")[0]',
+        '»':    'atob(true)[1]',
+        'Ç':    'atob("falsefalsefalse")[10]',
+        'Ú':    'atob("0truefalse")[1]',
+        'Ý':    'atob("0undefined")[2]',
+        'â':    'atob("falsefalseundefined")[11]',
+        'é':    'atob("0undefined")[1]',
+        'î':    'atob("0truefalse")[2]',
+        'ö':    'atob("0false")[1]',
+        'ø':    'atob("undefinedundefined")[10]',
         '∞':
         [
             define('Infinity[TO_LOCALE_STRING]("ja")[SLICE_OR_SUBSTR]("-1")'),
