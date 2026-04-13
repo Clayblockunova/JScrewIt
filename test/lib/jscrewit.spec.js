@@ -770,7 +770,7 @@ self,
                 'replaces empty string elements with the concat approach',
                 function ()
                 {
-                    var encoder = JScrewIt.debug.createEncoder('COMPACT');
+                    var encoder = JScrewIt.debug.createEncoder();
                     var output = encoder.replaceStringArray(['', '', ''], [], null, true, false);
                     expect(evalJSFuck(output)).toEqual([[], 0, 0]);
                 }
