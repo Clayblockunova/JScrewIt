@@ -28,6 +28,7 @@ This table lists features available in the most common engines.
 <li><a href="api-doc/interfaces/FeatureAll.md#NO_IE_SRC"><code>NO_IE_SRC</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#V8_SRC"><code>V8_SRC</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#REGEXP_STRING_ITERATOR"><code>REGEXP_STRING_ITERATOR</code></a>
+<li><a href="api-doc/interfaces/FeatureAll.md#RUSSIAN_INFINITY"><code>RUSSIAN_INFINITY</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#SELF"><code>SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> and <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#STATUS"><code>STATUS</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#V8_SRC"><code>V8_SRC</code></a>
@@ -60,6 +61,7 @@ This table lists features available in the most common engines.
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_ARRAY_ENTRIES_CTOR"><code>OBJECT_ARRAY_ENTRIES_CTOR</code></a> (not in Firefox 131+)
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#REGEXP_STRING_ITERATOR"><code>REGEXP_STRING_ITERATOR</code></a>
+<li><a href="api-doc/interfaces/FeatureAll.md#RUSSIAN_INFINITY"><code>RUSSIAN_INFINITY</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#SELF"><code>SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> and <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#SHORT_LOCALES"><code>SHORT_LOCALES</code></a> (not in Firefox 134+)
 <li><a href="api-doc/interfaces/FeatureAll.md#STATUS"><code>STATUS</code></a>
@@ -84,6 +86,7 @@ This table lists features available in the most common engines.
 <li><a href="api-doc/interfaces/FeatureAll.md#NO_V8_SRC"><code>NO_V8_SRC</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#IE_SRC"><code>IE_SRC</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#PLAIN_INTL"><code>PLAIN_INTL</code></a>
+<li><a href="api-doc/interfaces/FeatureAll.md#RUSSIAN_INFINITY"><code>RUSSIAN_INFINITY</code></a> (Internet Explorer 11 on Windows 8 and on Windows 10)
 <li><a href="api-doc/interfaces/FeatureAll.md#SELF"><code>SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> and <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#SHORT_LOCALES"><code>SHORT_LOCALES</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#STATUS"><code>STATUS</code></a>
@@ -116,6 +119,7 @@ This table lists features available in the most common engines.
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_ARRAY_ENTRIES_CTOR"><code>OBJECT_ARRAY_ENTRIES_CTOR</code></a> (not in Safari 18.4+)
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#REGEXP_STRING_ITERATOR"><code>REGEXP_STRING_ITERATOR</code></a>
+<li><a href="api-doc/interfaces/FeatureAll.md#RUSSIAN_INFINITY"><code>RUSSIAN_INFINITY</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#SELF"><code>SELF</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#OBJECT_W_SELF"><code>OBJECT_W_SELF</code></a> and <a href="api-doc/interfaces/FeatureAll.md#WINDOW"><code>WINDOW</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#SHORT_LOCALES"><code>SHORT_LOCALES</code></a> (not in Safari 18.0+)
 <li><a href="api-doc/interfaces/FeatureAll.md#STATUS"><code>STATUS</code></a>
@@ -144,6 +148,7 @@ This table lists features available in the most common engines.
 <li><a href="api-doc/interfaces/FeatureAll.md#NO_IE_SRC"><code>NO_IE_SRC</code></a> (implied by <a href="api-doc/interfaces/FeatureAll.md#V8_SRC"><code>V8_SRC</code></a>)
 <li><a href="api-doc/interfaces/FeatureAll.md#OBJECT_ARRAY_ENTRIES_CTOR"><code>OBJECT_ARRAY_ENTRIES_CTOR</code></a> (not in Node.js 22.0+)
 <li><a href="api-doc/interfaces/FeatureAll.md#REGEXP_STRING_ITERATOR"><code>REGEXP_STRING_ITERATOR</code></a>
+<li><a href="api-doc/interfaces/FeatureAll.md#RUSSIAN_INFINITY"><code>RUSSIAN_INFINITY</code></a>
 <li><a href="api-doc/interfaces/FeatureAll.md#SHORT_LOCALES"><code>SHORT_LOCALES</code></a> (not in Node.js 22.12–22.14 and 23.3+)
 <li><a href="api-doc/interfaces/FeatureAll.md#V8_SRC"><code>V8_SRC</code></a>
 </ul>

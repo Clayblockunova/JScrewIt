@@ -1,6 +1,7 @@
 import { Feature } from '../lib/jscrewit.js';
 
-import { calculateAvailabilityInfo, getAvailabilityByFeature, getDescription }
+import
+{ calculateAvailabilityInfo, getAvailabilityByFeature, getDescription, joinWithAnd, joinWithOr }
 from './internal/engine-data.mjs';
 
 const INDENT = '    ';
@@ -54,9 +55,6 @@ function getAvailabilityByRestriction(attributeName, family)
 export default
 () =>
 {
-    const AND_FORMATTER = new Intl.ListFormat('en');
-    const OR_FORMATTER  = new Intl.ListFormat('en', { type: 'disjunction' });
-
     const FAMILIES =
     [
         'Chrome',
@@ -79,7 +77,7 @@ export default
             {
                 result += ` This feature is not available ${environmentDescription}`;
                 if (report !== true)
-                    result += ` in ${formatReport(report)}`;
+                    result += ` in ${joinWithAnd(report)}`;
                 result += '.';
             }
         }
@@ -88,19 +86,13 @@ export default
         const { length } = availability;
         if (length)
         {
-            result = `Available in ${formatReport(availability)}.`;
+            result = `Available in ${joinWithAnd(availability)}.`;
             appendNote(webWorkerReport, 'inside web workers');
             appendNote(forcedStrictModeReport, 'when strict mode is enforced');
         }
         else
             result = 'This feature is not available in any of the supported engines.';
         return result;
-    }
-
-    function formatReport(report)
-    {
-        const formattedReport = AND_FORMATTER.format(report);
-        return formattedReport;
     }
 
     function getForcedStrictModeReport({ attributes: { 'forced-strict-mode': restriction } })
@@ -189,7 +181,7 @@ export default
                         if (aliases.length)
                         {
                             const formattedAliases =
-                            OR_FORMATTER.format(aliases.map(alias => `\`${alias}\``));
+                            joinWithOr(aliases.map(alias => `\`${alias}\``));
                             const formattedFeatureName = `\`${featureName}\``;
                             remarks +=
                             ` Use ${formattedAliases} instead of ${formattedFeatureName} for ` +

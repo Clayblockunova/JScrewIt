@@ -711,13 +711,10 @@
                 this,
                 function ()
                 {
-                    switch (this)
-                    {
-                    case Infinity:
+                    if (this === Infinity)
                         return '∞';
-                    case -Infinity:
+                    if (this === -Infinity)
                         return '-∞';
-                    }
                 }
             );
         },
@@ -731,10 +728,9 @@
                 {
                     if (locale === 'bn')
                     {
-                        var number = Number(this);
-                        if (!isNaN(number))
+                        if (this === this)
                         {
-                            var returnValue = formatLocaleNumeral(number, 0x09e6, 2);
+                            var returnValue = formatLocaleNumeral(this, 0x09e6, 2);
                             return returnValue;
                         }
                     }
@@ -750,28 +746,22 @@
                 this,
                 function (locale)
                 {
-                    var returnValue;
-                    var number;
                     switch (locale)
                     {
                     case 'ar':
                     case 'ar-td':
-                        number = Number(this);
-                        if (isNaN(number))
-                            returnValue = 'ليس\xa0رقم';
+                        if (this !== this)
+                            return 'ليس\xa0رقم';
                         break;
                     case 'fa':
-                        number = Number(this);
-                        if (isNaN(number))
-                            returnValue = 'ناعدد';
+                        if (this !== this)
+                            return 'ناعدد';
                         break;
                     case 'ru':
-                        number = Number(this);
-                        if (isNaN(number))
-                            returnValue = 'не\xa0число';
+                        if (this !== this)
+                            return 'не\xa0число';
                         break;
                     }
-                    return returnValue;
                 }
             );
         },
@@ -948,17 +938,12 @@
                 this,
                 function (locale)
                 {
-                    switch (locale)
+                    if (locale === 'ru')
                     {
-                    case 'ru':
-                        switch (this)
-                        {
-                        case Infinity:
+                        if (this === Infinity)
                             return '∞';
-                        case -Infinity:
+                        if (this === -Infinity)
                             return '-∞';
-                        }
-                        break;
                     }
                 }
             );
@@ -975,11 +960,9 @@
                 {
                     if (locale === 'ar' || locale === 'ar-td')
                     {
-                        var number = Number(this);
-                        if (!isNaN(number))
+                        if (this === this)
                         {
-                            var returnValue =
-                            formatLocaleNumeral(number, 0x660, undefined, '٫');
+                            var returnValue = formatLocaleNumeral(this, 0x660, undefined, '٫');
                             return returnValue;
                         }
                     }

@@ -566,6 +566,18 @@ Features available in Internet Explorer 11 on Windows 10.
 
 ***
 
+### IE\_11\_WIN\_8
+
+> **IE\_11\_WIN\_8**: [`PredefinedFeature`](PredefinedFeature.md)
+
+Features available in Internet Explorer 11 on Windows 8.
+
+#### Inherited from
+
+[`FeatureAll`](FeatureAll.md).[`IE_11_WIN_8`](FeatureAll.md#ie_11_win_8)
+
+***
+
 ### IE\_SRC
 
 > **IE\_SRC**: [`ElementaryFeature`](ElementaryFeature.md)
@@ -831,6 +843,22 @@ Available in Chrome, Edge, Firefox, Safari, Opera, and Node.js.
 #### Inherited from
 
 [`FeatureAll`](FeatureAll.md).[`REGEXP_STRING_ITERATOR`](FeatureAll.md#regexp_string_iterator)
+
+***
+
+### RUSSIAN\_INFINITY
+
+> **RUSSIAN\_INFINITY**: [`ElementaryFeature`](ElementaryFeature.md)
+
+Russian string representation of Infinity as "∞".
+
+#### Remarks
+
+Available in Chrome, Edge, Firefox, Internet Explorer 11 on Windows 8 and on Windows 10, Safari, Opera, and Node.js.
+
+#### Inherited from
+
+[`FeatureAll`](FeatureAll.md).[`RUSSIAN_INFINITY`](FeatureAll.md#russian_infinity)
 
 ***
 

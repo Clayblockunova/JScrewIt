@@ -1,5 +1,7 @@
-import { Feature }                                  from '../lib/jscrewit.js';
-import { getAvailabilityByFeature, getDescription } from './internal/engine-data.mjs';
+import { Feature } from '../lib/jscrewit.js';
+
+import { getAvailabilityByFeature, getDescription, joinWithAnd }
+from './internal/engine-data.mjs';
 
 function formatFeatureName(featureName)
 {
@@ -62,8 +64,6 @@ function getVersioningFor(featureName, families)
 export default
 () =>
 {
-    const AND_FORMATTER = new Intl.ListFormat('en');
-
     const FAMILY_LISTS =
     [
         ['Chrome', 'Edge', 'Opera'],
@@ -87,7 +87,7 @@ export default
                 componentEntry += ' (';
                 if (impliers)
                 {
-                    const featureNameList = AND_FORMATTER.format(impliers.map(formatFeatureName));
+                    const featureNameList = joinWithAnd(impliers.map(formatFeatureName));
                     componentEntry += `implied by ${featureNameList}`;
                     if (versioning)
                         componentEntry += '; ';

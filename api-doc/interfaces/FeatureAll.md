@@ -336,6 +336,14 @@ Features available in Internet Explorer 11 on Windows 10.
 
 ***
 
+### IE\_11\_WIN\_8
+
+> **IE\_11\_WIN\_8**: [`PredefinedFeature`](PredefinedFeature.md)
+
+Features available in Internet Explorer 11 on Windows 8.
+
+***
+
 ### IE\_SRC
 
 > **IE\_SRC**: [`ElementaryFeature`](ElementaryFeature.md)
@@ -533,6 +541,18 @@ The property that the string representation of String.prototype.matchAll\(\) eva
 #### Remarks
 
 Available in Chrome, Edge, Firefox, Safari, Opera, and Node.js.
+
+***
+
+### RUSSIAN\_INFINITY
+
+> **RUSSIAN\_INFINITY**: [`ElementaryFeature`](ElementaryFeature.md)
+
+Russian string representation of Infinity as "∞".
+
+#### Remarks
+
+Available in Chrome, Edge, Firefox, Internet Explorer 11 on Windows 8 and on Windows 10, Safari, Opera, and Node.js.
 
 ***
 
