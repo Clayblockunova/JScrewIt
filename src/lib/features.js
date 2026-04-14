@@ -734,8 +734,6 @@ var featureInfos =
             LOCALE_NUMERALS_BN:          true,
             LOCALE_NUMERALS_EXT:         true,
             LOCALE_NUMERALS_IE11_WIN7_8: false,
-            RUSSIAN_INFINITY:            true,
-
         },
     },
     NODE_20:
