@@ -47,7 +47,7 @@ export default function createEngineSelectionBox()
 
     var QUESTION_MARK_SIZE = '10.5pt';
 
-    function createCheckBox(text, inputProps)
+    function createCheckBox(labelContent, inputProps)
     {
         var checkBox =
         art
@@ -60,7 +60,7 @@ export default function createEngineSelectionBox()
                 { style: { display: 'table-cell', verticalAlign: 'middle' } },
                 art('INPUT', { style: { margin: '0 .25em 0 0' }, type: 'checkbox' }, inputProps)
             ),
-            art('SPAN', { style: { display: 'table-cell' } }, text)
+            art('SPAN', { style: { display: 'table-cell' } }, labelContent)
         );
         return checkBox;
     }
@@ -102,6 +102,30 @@ export default function createEngineSelectionBox()
             art.on('click', showHelp)
         );
         return questionMark;
+    }
+
+    function createShortTagLabel(shortTag)
+    {
+        var shortTagLabel;
+        if (shortTag[0] !== 'W')
+            shortTagLabel = shortTag;
+        else
+        {
+            var namespaceURI = 'http://www.w3.org/2000/svg';
+            var svg = document.createElementNS(namespaceURI, 'svg');
+            svg.setAttribute('class', 'windows-logo-icon');
+            svg.setAttribute('viewBox', '0 0 88 88');
+            var path = svg.appendChild(document.createElementNS(namespaceURI, 'path'));
+            path.setAttribute
+            (
+                'd',
+                'M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 ' +
+                '75.48.026 45.7zm4.326-39.025L87.314 0v41.527l-47.318.376zm47.329 39.349l-.011 ' +
+                '41.34-47.318-6.678-.066-34.739z'
+            );
+            shortTagLabel = art('SPAN', svg, shortTag.slice(1));
+        }
+        return shortTagLabel;
     }
 
     function dispatchInputEvent()
@@ -225,11 +249,13 @@ export default function createEngineSelectionBox()
                         )
                         .join(', ');
                         var shortTag = compatibility.shortTag;
-                        if (shortTag != null)
-                            versionText += ' (' + shortTag + ')';
+                        var versionLabel =
+                        shortTag == null ?
+                        versionText :
+                        art('SPAN', versionText, ' (', createShortTagLabel(shortTag), ')');
                         versionCheckBox =
                         createCheckBox
-                        (versionText, { checked: true, featureName: compatibility.featureName });
+                        (versionLabel, { checked: true, featureName: compatibility.featureName });
                     }
                     art
                     (
@@ -300,3 +326,14 @@ art.css('.help-text', { 'font-size': '11pt', 'text-align': 'justify' });
 art.css('.help-text code', { 'white-space': 'pre' });
 art.css('.help-text dfn', { 'font-style': 'normal', 'font-weight': 'bold' });
 art.css('.help-text li', { 'margin': '.5em 0' });
+art.css
+(
+    '.windows-logo-icon',
+    {
+        display:            'inline-block',
+        height:             '.8em',
+        margin:             '0 .05em',
+        'vertical-align':   '-.1em',
+        width:              '.8em',
+    }
+);
