@@ -13,25 +13,27 @@ const RAW_PREDEFS =
     'BASE64_ALPHABET_HI_4:5':   'UVWX',
     'BASE64_ALPHABET_LO_4:1':   ['0B', '0R', '0h', '0x'],
     'BASE64_ALPHABET_LO_4:3':   ['0D', '0T', '0j', '0z'],
+    FORMAT_MAPPER_LONG:
+    (encoder, formatMapper) =>
+    {
+        const { argName } = formatMapper;
+        const expr = formatMapper(`[parseInt(${argName},3)]`);
+        const replacement = encoder.replaceExpr(expr, true);
+        return replacement;
+    },
+    FORMAT_MAPPER_SHORT:
+    (encoder, formatMapper) =>
+    {
+        const { argName } = formatMapper;
+        const expr = formatMapper(`.indexOf(${argName})`);
+        const replacement = encoder.replaceExpr(expr, true);
+        return replacement;
+    },
     FROM_CHAR_CODE:             (encoder, str) => encoder.replaceString(str, { optimize: true }),
     FROM_CHAR_CODE_CALLBACK_FORMATTER:
     (encoder, fromCharCodeCallbackFormatter) =>
     {
         const str = fromCharCodeCallbackFormatter('0');
-        const replacement = encoder.replaceString(str, { optimize: true });
-        return replacement;
-    },
-    MAPPER_FORMATTER:
-    (encoder, mapperFormatter) =>
-    {
-        const expr = mapperFormatter('f', '[f]');
-        const replacement = encoder.replaceExpr(expr, true);
-        return replacement;
-    },
-    OPTIMAL_ARG_NAME:
-    (encoder, argName) =>
-    {
-        const str = `function(${argName}){return this[parseInt(${argName},3)]}`;
         const replacement = encoder.replaceString(str, { optimize: true });
         return replacement;
     },

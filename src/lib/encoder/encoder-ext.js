@@ -9,10 +9,10 @@ from '../append-lengths';
 import
 {
     AMENDINGS,
+    FORMAT_MAPPER_LONG,
+    FORMAT_MAPPER_SHORT,
     FROM_CHAR_CODE,
     FROM_CHAR_CODE_CALLBACK_FORMATTER,
-    MAPPER_FORMATTER,
-    OPTIMAL_ARG_NAME,
     OPTIMAL_RETURN_STRING,
     SIMPLE,
 }
@@ -349,10 +349,10 @@ function encodeByDblDict
     );
     if (!charFigureArrayStr)
         return;
-    var formatter = encoder.findDefinition(MAPPER_FORMATTER);
-    var argName = 'undefined';
+    var formatMapper = encoder.findDefinition(FORMAT_MAPPER_SHORT);
+    var argName = formatMapper.argName;
     var accessor = '.indexOf(' + argName + ')';
-    var mapper = formatter(argName, accessor);
+    var mapper = formatMapper(accessor);
     var charIndexArrayStr =
     createJSFuckArrayMapping(encoder, charFigureArrayStr, mapper, figureLegend);
     var output = encoder.createDictEncoding(legend, charIndexArrayStr, maxLength);
@@ -1176,11 +1176,11 @@ assignNoEnum
             var mapper;
             if (radix)
             {
-                var formatter = this.findDefinition(MAPPER_FORMATTER);
-                var argName = this.findDefinition(OPTIMAL_ARG_NAME);
+                var formatMapper = this.findDefinition(FORMAT_MAPPER_LONG);
+                var argName = formatMapper.argName;
                 var parseIntArg = (coerceToInt ? '+' : '') + argName;
                 var accessor = '[parseInt(' + parseIntArg + ',' + radix + ')]';
-                mapper = formatter(argName, accessor);
+                mapper = formatMapper(accessor);
             }
             else
                 mapper = '"".charAt.bind';

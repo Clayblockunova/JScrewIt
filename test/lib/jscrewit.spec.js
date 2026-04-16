@@ -405,6 +405,20 @@ self,
                     expect(evalJSFuck(output)).toBe(input);
                 }
             );
+            emuIt
+            (
+                'returns correct JSFuck with feature ARRAY_ITERATOR',
+                Feature.ARRAY_ITERATOR,
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder(Feature.ARRAY_ITERATOR);
+                    var input =
+                    'const pick = (arr, i) => arr[(i % arr.length + arr.length) % arr.length];';
+                    var output = encoder._encodeBySparseFigures(Object(input));
+                    expect(output).toBeJSFuck();
+                    expect(evalJSFuck(output)).toBe(input);
+                }
+            );
             it
             (
                 'returns undefined for too complex input',
