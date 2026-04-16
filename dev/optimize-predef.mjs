@@ -311,14 +311,14 @@ function runAnalysis(predefTestData)
 {
     SolutionBookMap.load();
     const nodes = new Set();
-    const { availableEntries, replaceVariant, useReverseIteration } = predefTestData;
+    const { availableEntries, replaceVariant } = predefTestData;
     const VarSet = createVarSet(availableEntries);
     progress
     (
         'Scanning definitions',
         bar =>
         {
-            const analyzer = new Analyzer(Feature.DEFAULT, useReverseIteration);
+            const analyzer = new Analyzer(Feature.DEFAULT);
             let encoder;
             while (encoder = analyzer.nextEncoder)
             {

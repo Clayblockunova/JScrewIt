@@ -29,16 +29,12 @@ const RAW_PREDEFS =
         return replacement;
     },
     OPTIMAL_ARG_NAME:
-    Object.assign
-    (
-        (encoder, argName) =>
-        {
-            const str = `function(${argName}){return this[parseInt(${argName},3)]}`;
-            const replacement = encoder.replaceString(str, { optimize: true });
-            return replacement;
-        },
-        { useReverseIteration: true },
-    ),
+    (encoder, argName) =>
+    {
+        const str = `function(${argName}){return this[parseInt(${argName},3)]}`;
+        const replacement = encoder.replaceString(str, { optimize: true });
+        return replacement;
+    },
     OPTIMAL_B:                  (encoder, char) => encoder.resolveCharacter(char).replacement,
     OPTIMAL_RETURN_STRING:      (encoder, str) => encoder.replaceString(str, { optimize: true }),
 };
@@ -65,7 +61,6 @@ function getPredef(predefName)
         let availableEntries;
         let replaceVariant;
         let formatVariant;
-        let useReverseIteration;
         const rawPredef = RAW_PREDEFS[predefName];
         if (rawPredef[Symbol.iterator])
         {
@@ -76,26 +71,17 @@ function getPredef(predefName)
             else
                 replaceVariant = (encoder, char) => encoder.resolveCharacter(char).replacement;
             formatVariant = variant => `'${variant}'`;
-            useReverseIteration = false;
         }
         else
         {
             availableEntries = getEntries(`${predefName}:available`);
             replaceVariant = rawPredef;
             formatVariant = createFormatVariantByIndex(availableEntries);
-            useReverseIteration = rawPredef.useReverseIteration || false;
         }
         const variantToMinMaskMap = new Map();
         availableEntries.forEach
         (({ definition, mask }) => variantToMinMaskMap.set(definition, mask));
-        predef =
-        {
-            availableEntries,
-            formatVariant,
-            replaceVariant,
-            useReverseIteration,
-            variantToMinMaskMap,
-        };
+        predef = { availableEntries, formatVariant, replaceVariant, variantToMinMaskMap };
     }
     predef.indent = 8;
     predef.organizedEntries = getEntries(predefName);
