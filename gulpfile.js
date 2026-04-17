@@ -157,6 +157,14 @@ task
                 {
                     files:              ['test/**/*.js'],
                     jsVersion:          5,
+                    ignores:            ['test/cli.spec.js', 'test/patch-cov-source.js'],
+                    languageOptions:    { sourceType: 'script' },
+                    plugins:            ebddPlugins,
+                    processor:          new EslintEnvProcessor({ plugins: ebddPlugins }),
+                },
+                {
+                    files:              ['test/cli.spec.js'],
+                    jsVersion:          2022,
                     ignores:            ['test/patch-cov-source.js'],
                     languageOptions:    { sourceType: 'script' },
                     plugins:            ebddPlugins,
