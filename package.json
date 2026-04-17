@@ -80,6 +80,9 @@
     "typescript": "latest",
     "uglify-js": "3.19.1"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "workspaces": [
     "./packages/*"
   ]
