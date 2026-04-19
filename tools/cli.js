@@ -81,9 +81,8 @@ function formatPerfInfoList(perfInfoList, padding, paddingChars)
     return str;
 }
 
-function parseCommandLine(argv)
+function parseCommandLine([,, ...args])
 {
-    const args = argv.slice(2);
     const parsed =
     parseArgs
     (
@@ -101,7 +100,6 @@ function parseCommandLine(argv)
                 'trim-code':    { type: 'boolean', short: 't' },
                 'version':      { type: 'boolean', short: 'v' },
                 'wrap':         { type: 'boolean', short: 'w' },
-                'wrap-with':    { type: 'string' },
             },
             allowPositionals:   true,
             strict:             true,
@@ -118,13 +116,14 @@ function parseCommandLine(argv)
     const options = { };
     if (values.diagnostic)
         options.perfInfo = { };
-    if (values.features != null)
-        options.features = values.features.trim().split(/(?:\s+|\s*,\s*)/);
+    const { features } = values;
+    if (features != null)
+        options.features = features.trim().split(/(?:\s+|\s*,\s*)/);
     if (values['trim-code'])
         options.trimCode = true;
-    const explicitRunAs = values['run-as'] ?? values['wrap-with'];
-    if (explicitRunAs != null)
-        options.runAs = explicitRunAs;
+    const runAs = values['run-as'];
+    if (runAs != null)
+        options.runAs = runAs;
     else
     {
         const { express } = values;
