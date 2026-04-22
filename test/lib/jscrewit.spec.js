@@ -227,18 +227,36 @@ self,
         'Encoder#_encodeByDenseFigures',
         function ()
         {
-            it
+            describe
             (
-                'returns correct JSFuck',
+                'with FORMAT_MAPPER_SHORT',
                 function ()
                 {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    var input =
-                    'The thirty-three thieves thought that they thrilled the throne throughout ' +
-                    'Thursday.';
-                    var output = encoder._encodeByDenseFigures(Object(input));
-                    expect(output).toBeJSFuck();
-                    expect(evalJSFuck(output)).toBe(input);
+                    function testEntry(entry, index)
+                    {
+                        var featureObj = JScrewIt.debug.featureFromMask(entry.mask);
+                        emuIt
+                        (
+                            '(definition ' + index + ')',
+                            featureObj,
+                            function ()
+                            {
+                                var encoder = JScrewIt.debug.createEncoder(featureObj);
+                                var formatMapper = entry.definition;
+                                encoder._findFormatMapperShort =
+                                function () { return formatMapper; };
+                                var input =
+                                'const pick = (arr, i) => arr[(i % arr.length + arr.length) % ' +
+                                'arr.length];';
+                                var output = encoder._encodeByDenseFigures(Object(input));
+                                expect(output).toBeJSFuck();
+                                expect(emuEval(this.test.emuFeatureNames, output)).toBe(input);
+                            }
+                        );
+                    }
+
+                    var entries = JScrewIt.debug.getEntries('FORMAT_MAPPER_SHORT:available');
+                    entries.forEach(testEntry);
                 }
             );
             it
@@ -391,32 +409,36 @@ self,
         'Encoder#_encodeBySparseFigures',
         function ()
         {
-            it
+            describe
             (
-                'returns correct JSFuck',
+                'with FORMAT_MAPPER_SHORT',
                 function ()
                 {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    var input =
-                    'The thirty-three thieves thought that they thrilled the throne throughout ' +
-                    'Thursday.';
-                    var output = encoder._encodeBySparseFigures(Object(input));
-                    expect(output).toBeJSFuck();
-                    expect(evalJSFuck(output)).toBe(input);
-                }
-            );
-            emuIt
-            (
-                'returns correct JSFuck with feature ARRAY_ITERATOR',
-                Feature.ARRAY_ITERATOR,
-                function ()
-                {
-                    var encoder = JScrewIt.debug.createEncoder(Feature.ARRAY_ITERATOR);
-                    var input =
-                    'const pick = (arr, i) => arr[(i % arr.length + arr.length) % arr.length];';
-                    var output = encoder._encodeBySparseFigures(Object(input));
-                    expect(output).toBeJSFuck();
-                    expect(evalJSFuck(output)).toBe(input);
+                    function testEntry(entry, index)
+                    {
+                        var featureObj = JScrewIt.debug.featureFromMask(entry.mask);
+                        emuIt
+                        (
+                            '(definition ' + index + ')',
+                            featureObj,
+                            function ()
+                            {
+                                var encoder = JScrewIt.debug.createEncoder(featureObj);
+                                var formatMapper = entry.definition;
+                                encoder._findFormatMapperShort =
+                                function () { return formatMapper; };
+                                var input =
+                                'const pick = (arr, i) => arr[(i % arr.length + arr.length) % ' +
+                                'arr.length];';
+                                var output = encoder._encodeBySparseFigures(Object(input));
+                                expect(output).toBeJSFuck();
+                                expect(emuEval(this.test.emuFeatureNames, output)).toBe(input);
+                            }
+                        );
+                    }
+
+                    var entries = JScrewIt.debug.getEntries('FORMAT_MAPPER_SHORT:available');
+                    entries.forEach(testEntry);
                 }
             );
             it

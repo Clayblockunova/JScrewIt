@@ -350,7 +350,7 @@ function encodeByDblDict
     );
     if (!charIndexFigureArrayStr)
         return;
-    var formatMapper = encoder.findDefinition(FORMAT_MAPPER_SHORT);
+    var formatMapper = encoder._findFormatMapperShort();
     var argName = formatMapper.argName;
     var accessor = '.indexOf(' + argName + ')';
     var mapper = formatMapper(accessor);
@@ -1160,6 +1160,13 @@ assignNoEnum
             if (output == null)
                 throw new _Error('Encoding failed');
             return output;
+        },
+
+        _findFormatMapperShort:
+        function ()
+        {
+            var formatMapper = this.findDefinition(FORMAT_MAPPER_SHORT);
+            return formatMapper;
         },
 
         _maxDecodableArgs:  65533, // Limit imposed by Internet Explorer.
