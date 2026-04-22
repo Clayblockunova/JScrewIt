@@ -24,9 +24,7 @@ const RAW_PREDEFS =
     FORMAT_MAPPER_SHORT:
     (encoder, formatMapper) =>
     {
-        const { argName } = formatMapper;
-        const expr = formatMapper(`.indexOf(${argName})`);
-        const replacement = encoder.replaceExpr(expr, true);
+        const replacement = encoder._createDblDictEncoding(formatMapper, '[]', '[]', '[]+[]');
         return replacement;
     },
     FROM_CHAR_CODE:             (encoder, str) => encoder.replaceString(str, { optimize: true }),

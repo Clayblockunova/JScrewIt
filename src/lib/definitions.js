@@ -1434,90 +1434,55 @@ function getFHPaddingEntries(index)
 
     FH_R_PADDING_SHIFTS = [define(1, IE_SRC), define(0, NO_IE_SRC)];
 
-    var FORMAT_MAPPER_ENTRIES =
-    [
-        define
-        (
-            (function () {
-                var formatMapper =
-                function (accessor)
-                {
-                    var mapper =
-                    'Function("return function(falsefalse){return function(undefined){return ' +
-                    'falsefalse' + accessor + '}}")()';
-                    return mapper;
-                };
-                formatMapper.argName = 'undefined';
-                return formatMapper;
-            })()
-        ),
-        define
-        (
-            (function () {
-                var formatMapper =
-                function (accessor)
-                {
-                    var mapper =
-                    'Function("return function(undefined){return this' + accessor + '}")().bind';
-                    return mapper;
-                };
-                formatMapper.argName = 'undefined';
-                return formatMapper;
-            })()
-        ),
-        define
-        (
-            (function () {
-                var formatMapper =
-                function (accessor)
-                {
-                    var mapper =
-                    'Function("return function(f){return this' + accessor + '}")().bind';
-                    return mapper;
-                };
-                formatMapper.argName = 'f';
-                return formatMapper;
-            })()
-        ),
-        define
-        (
-            (function () {
-                var formatMapper =
-                function (accessor)
-                {
-                    var mapper =
-                    'Function("return falsefalse=>undefined=>falsefalse' + accessor + '")()';
-                    return mapper;
-                };
-                formatMapper.argName = 'undefined';
-                return formatMapper;
-            })(),
-            ARROW
-        ),
-    ];
-
     FORMAT_MAPPER_LONG =
     defineList
     (
-        FORMAT_MAPPER_ENTRIES,
         [
-            define(0),
-            define(2, ARRAY_ITERATOR),
-            define(0, NO_FF_SRC),
-            define(0, NO_V8_SRC),
-            define(2, ARRAY_ITERATOR, CAPITAL_HTML),
-            define(0, ARRAY_ITERATOR, AT),
-            define(0, ARRAY_ITERATOR, FLAT),
-            define(0, ARRAY_ITERATOR, NO_IE_SRC),
-            define(0, ARRAY_ITERATOR, CAPITAL_HTML, IE_SRC),
-            define(3),
-        ]
-    );
-
-    FORMAT_MAPPER_SHORT =
-    defineList
-    (
-        FORMAT_MAPPER_ENTRIES,
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(falsefalse){return function(undefined){return ' +
+                        'falsefalse' + accessor + '}}")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'undefined';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(f){return this' + accessor + '}")().bind';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'f';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return falsefalse=>undefined=>falsefalse' + accessor + '")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'undefined';
+                    return formatMapper;
+                })(),
+                ARROW
+            ),
+        ],
         [
             define(0),
             define(1, ARRAY_ITERATOR),
@@ -1528,8 +1493,47 @@ function getFHPaddingEntries(index)
             define(0, ARRAY_ITERATOR, FLAT),
             define(0, ARRAY_ITERATOR, NO_IE_SRC),
             define(0, ARRAY_ITERATOR, CAPITAL_HTML, IE_SRC),
-            define(3),
+            define(2),
         ]
+    );
+
+    FORMAT_MAPPER_SHORT =
+    defineList
+    (
+        [
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(undefined){return function(falsefalse){return ' +
+                        'undefined[1][undefined[0]' + accessor + ']}}")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'falsefalse';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return undefined=>falsefalse=>undefined[1][undefined[0]' +
+                        accessor + ']")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'falsefalse';
+                    return formatMapper;
+                })(),
+                ARROW
+            ),
+        ],
+        [define(0), define(1)]
     );
 
     FROM_CHAR_CODE =

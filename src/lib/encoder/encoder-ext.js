@@ -351,12 +351,9 @@ function encodeByDblDict
     if (!charIndexFigureArrayStr)
         return;
     var formatMapper = encoder._findFormatMapperShort();
-    var argName = formatMapper.argName;
-    var accessor = '.indexOf(' + argName + ')';
-    var mapper = formatMapper(accessor);
-    var charIndexArrayStr =
-    createJSFuckArrayMapping(encoder, charIndexFigureArrayStr, mapper, figureLegend);
-    var output = encoder.createDictEncoding(legend, charIndexArrayStr, maxLength);
+    var output =
+    encoder._createDblDictEncoding
+    (formatMapper, charIndexFigureArrayStr, figureLegend, legend, maxLength);
     return output;
 }
 
@@ -460,6 +457,13 @@ function initMinFalseFreeCharIndexArrayStrLength(input)
 function initMinFalseTrueCharIndexArrayStrLength()
 {
     return -1;
+}
+
+function joinArrayStr(encoder, arrayStr, maxLength)
+{
+    var output = arrayStr + '[' + encoder.replaceString('join') + ']([])';
+    if (!(output.length > maxLength))
+        return output;
 }
 
 function splitIntoCharCodes(str, radix, cache)
@@ -864,7 +868,7 @@ var falseTrueFigurator = createFigurator(['false', 'true'], '');
                 return output;
             },
             ENCODING_TYPE_TEXT,
-            193
+            194
         ),
 
         /* -------------------------------------------------------------------------------------- *\
@@ -919,7 +923,7 @@ var falseTrueFigurator = createFigurator(['false', 'true'], '');
                 return output;
             },
             ENCODING_TYPE_TEXT,
-            347
+            173
         ),
 
         /* -------------------------------------------------------------------------------------- *\
@@ -1016,6 +1020,40 @@ assignNoEnum
             return figureLegendInsertions;
         },
 
+        _createDblDictEncoding:
+        function (formatMapper, charIndexFigureArrayStr, figureLegend, legend, maxLength)
+        {
+            var argName = formatMapper.argName;
+            var accessor = '.indexOf(' + argName + ')';
+            var mapper = formatMapper(accessor);
+            var concatReplacement = this.replaceString('concat', { optimize: true });
+            var combinedLegend =
+            '[' + figureLegend + '][' + concatReplacement + '](' + legend + ')';
+            var charIndexArrayStr =
+            createJSFuckArrayMapping(this, charIndexFigureArrayStr, mapper, combinedLegend);
+            var output = joinArrayStr(this, charIndexArrayStr, maxLength);
+            return output;
+        },
+
+        _createDictEncoding:
+        function (charIndexArrayStr, legend, maxLength, radix, coerceToInt)
+        {
+            var mapper;
+            if (radix)
+            {
+                var formatMapper = this.findDefinition(FORMAT_MAPPER_LONG);
+                var argName = formatMapper.argName;
+                var parseIntArg = (coerceToInt ? '+' : '') + argName;
+                var accessor = '[parseInt(' + parseIntArg + ',' + radix + ')]';
+                mapper = formatMapper(accessor);
+            }
+            else
+                mapper = '"".charAt.bind';
+            var arrayStr = createJSFuckArrayMapping(this, charIndexArrayStr, mapper, legend);
+            var output = joinArrayStr(this, arrayStr, maxLength);
+            return output;
+        },
+
         _encodeByCharCodes:
         function (inputData, radix, maxLength)
         {
@@ -1110,7 +1148,7 @@ assignNoEnum
             if (!charIndexArrayStr)
                 return;
             var output =
-            this.createDictEncoding(legend, charIndexArrayStr, maxLength, radix, coerceToInt);
+            this._createDictEncoding(charIndexArrayStr, legend, maxLength, radix, coerceToInt);
             return output;
         },
 
@@ -1170,27 +1208,6 @@ assignNoEnum
         },
 
         _maxDecodableArgs:  65533, // Limit imposed by Internet Explorer.
-
-        createDictEncoding:
-        function (legend, charIndexArrayStr, maxLength, radix, coerceToInt)
-        {
-            var mapper;
-            if (radix)
-            {
-                var formatMapper = this.findDefinition(FORMAT_MAPPER_LONG);
-                var argName = formatMapper.argName;
-                var parseIntArg = (coerceToInt ? '+' : '') + argName;
-                var accessor = '[parseInt(' + parseIntArg + ',' + radix + ')]';
-                mapper = formatMapper(accessor);
-            }
-            else
-                mapper = '"".charAt.bind';
-            var output =
-            createJSFuckArrayMapping(this, charIndexArrayStr, mapper, legend) + '[' +
-            this.replaceString('join') + ']([])';
-            if (!(output.length > maxLength))
-                return output;
-        },
 
         // Array elements may not contain the substring "false", because the value false could be
         // used as a separator in the encoding.
