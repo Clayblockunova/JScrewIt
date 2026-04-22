@@ -1,6 +1,6 @@
 import type { Mask } from './mask';
 
-const keyFor = (mask: Mask): PropertyKey => mask as never as PropertyKey;
+const keyFor = (mask: Mask): PropertyKey => mask as never;
 
 class MaskIndex<ValueType>
 {
