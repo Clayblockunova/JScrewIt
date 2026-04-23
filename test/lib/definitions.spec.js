@@ -78,6 +78,17 @@ self,
         return validator;
     }
 
+    function isExpectedMaybeCombinedString(expected)
+    {
+        var validator =
+        function ()
+        {
+            this.toBe(expected);
+        };
+        validator.expectedComputedTypes = SolutionType.STRING | SolutionType.COMBINED_STRING;
+        return validator;
+    }
+
     function testCharacter(charCode)
     {
         function testDefault()
@@ -419,30 +430,30 @@ self,
         {
             var paramDataMap =
             {
-                Array:          isExpected(Array),
-                Boolean:        isExpected(Boolean),
-                Function:       isExpected(Function),
+                Array:              isExpected(Array),
+                Boolean:            isExpected(Boolean),
+                Function:           isExpected(Function),
                 Intl:
                 function ()
                 {
                     this.toBe(Intl);
                 },
-                Number:         isExpected(Number),
-                Object:         isExpected(Object),
-                RegExp:         isExpected(RegExp),
-                String:         isExpected(String),
+                Number:             isExpected(Number),
+                Object:             isExpected(Object),
+                RegExp:             isExpected(RegExp),
+                String:             isExpected(String),
                 document:
                 function ()
                 {
                     this.toBe(document);
                 },
-                escape:         isExpected(escape),
+                escape:             isExpected(escape),
                 self:
                 function ()
                 {
                     this.toBe(self);
                 },
-                unescape:       isExpected(unescape),
+                unescape:           isExpected(unescape),
                 ANY_FUNCTION:
                 function ()
                 {
@@ -459,8 +470,9 @@ self,
                 {
                     this.toBe(Array.prototype.at);
                 },
-                FBEP_9_U:       isExpectedBooleanOrUndefined(),
-                FBP_9_U:        isExpectedBooleanOrUndefined(),
+                CONCAT:             isExpected('concat'),
+                FBEP_9_U:           isExpectedBooleanOrUndefined(),
+                FBP_9_U:            isExpectedBooleanOrUndefined(),
                 FILTER:
                 function ()
                 {
@@ -481,11 +493,13 @@ self,
                 {
                     this.toBeBoolean();
                 },
+                JOIN:               isExpected('join'),
                 LOCALE_AR:
                 function ()
                 {
                     this.toMatch(/^ar(-td)?$/);
                 },
+                MAP:                isExpectedMaybeCombinedString('map'),
                 PLAIN_OBJECT:
                 function ()
                 {
@@ -507,8 +521,10 @@ self,
                 {
                     this.toMatch(/^(?:slice|substr)$/);
                 },
-                TO_STRING:      isExpected('toString'),
-                TO_UPPER_CASE:  isExpected('toUpperCase'),
+                SPLIT:              isExpected('split'),
+                TO_LOCALE_STRING:   isExpected('toLocaleString'),
+                TO_STRING:          isExpected('toString'),
+                TO_UPPER_CASE:      isExpected('toUpperCase'),
             };
             var paramDataList =
             JScrewIt.debug.getConstantNames().map

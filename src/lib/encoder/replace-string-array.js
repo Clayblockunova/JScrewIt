@@ -1,6 +1,33 @@
 import { SCREW_AS_BONDED_STRING, SCREW_AS_STRING, SCREW_NORMAL }    from '../screw-buffer';
 import { replaceStaticString }                                      from './encoder-utils';
 
+// Length of the shortest possible concat head replacement "[]".
+var CONCAT_HEAD_MIN_LENGTH      = 2;
+
+// The overhead of "[" + "]" plus the minimum concat head replacement length.
+var CONCAT_HEAD_MIN_OVERHEAD    = 2 + CONCAT_HEAD_MIN_LENGTH;
+
+// Length of the shortest possible concat part replacements "+[] and "![]".
+var CONCAT_PART_MIN_LENGTH      = 3;
+
+// The overhead of "[" + "](" + ")" plus the minimum concat part replacement length.
+var CONCAT_PART_MIN_OVERHEAD    = 4 + CONCAT_PART_MIN_LENGTH;
+
+// Length of the shortest possible joiner replacement "[]".
+var JOINER_MIN_LENGTH           = 2;
+
+// The overhead of "[" + "](" + ")" plus the minimum joiner replacement length.
+var JOINING_MIN_OVERHEAD        = 4 + JOINER_MIN_LENGTH;
+
+// Length of the shortest possible separator replacement "[]".
+var SEPARATOR_MIN_LENGTH        = 2;
+
+// The overhead of "[" + "](" + ")" plus the minimum separator replacement length.
+var SEPARATION_MIN_OVERHEAD     = 4 + SEPARATOR_MIN_LENGTH;
+
+// Length of the shortest possible sequence replacement "([]+[])".
+var SEQUENCE_MIN_LENGTH         = 7;
+
 /**
  * An object that exposes properties used to split a string into an array of strings or to join
  * array elements into a string.
@@ -16,6 +43,81 @@ import { replaceStaticString }                                      from './enco
  * to join them into a single string.
  */
 
+function createConcatenationReplacement
+(encoder, array, allowZeroForEmptyElements, forceString, maxLength)
+{
+    var concatReplacement = encoder.resolveConstant('CONCAT').replacement;
+    var concatCount = array.length - 1;
+    maxLength -=
+    CONCAT_HEAD_MIN_OVERHEAD + concatCount * (concatReplacement.length + CONCAT_PART_MIN_OVERHEAD);
+    if (maxLength < 0)
+        return;
+    var options = { screwMode: forceString ? SCREW_AS_STRING : SCREW_NORMAL };
+    var replacements = [];
+    for (var index = 0; index <= concatCount; ++index)
+    {
+        var element = array[index];
+        var elementReplacement = undefinedAsString(replaceStaticString(element, options));
+        var minLength = index ? CONCAT_PART_MIN_LENGTH : CONCAT_HEAD_MIN_LENGTH;
+        if (index)
+        {
+            if (elementReplacement === '[]')
+                elementReplacement = allowZeroForEmptyElements ? '+[]' : '[[]]';
+            replacements.push('[', concatReplacement, '](', elementReplacement, ')');
+        }
+        else
+            replacements.push('[', elementReplacement, ']');
+        maxLength -= elementReplacement.length - minLength;
+        if (maxLength < 0)
+            return;
+    }
+    var concatenationReplacement = replacements.join('');
+    return concatenationReplacement;
+}
+
+function createSubstitutionsReplacement(encoder, substitutions, maxLength)
+{
+    var substitutionCount = substitutions ? substitutions.length : 0;
+    if (!substitutionCount)
+        return '';
+    var splitReplacement = encoder.resolveConstant('SPLIT').replacement;
+    var joinReplacement = encoder.resolveConstant('JOIN').replacement;
+    maxLength -=
+    substitutionCount *
+    (
+        splitReplacement.length + SEPARATION_MIN_OVERHEAD +
+        joinReplacement.length + JOINING_MIN_OVERHEAD
+    );
+    if (maxLength < 0)
+        return;
+    var replacements = [];
+    for (var index = 0; index < substitutionCount; ++index)
+    {
+        var substitution = substitutions[index];
+        var separatorReplacement = undefinedAsString(encoder.replaceExpr(substitution.separator));
+        var joinerReplacement = undefinedAsString(encoder.replaceString(substitution.joiner));
+        maxLength -=
+        separatorReplacement.length - SEPARATOR_MIN_LENGTH +
+        joinerReplacement.length - JOINER_MIN_LENGTH;
+        if (maxLength < 0)
+            return;
+        replacements.push
+        (
+            '[',
+            splitReplacement,
+            '](',
+            separatorReplacement,
+            ')[',
+            joinReplacement,
+            '](',
+            joinerReplacement,
+            ')'
+        );
+    }
+    var substitutionsReplacement = replacements.join('');
+    return substitutionsReplacement;
+}
+
 function replaceJoinedArrayString(array, joiner, maxLength)
 {
     var str = array.join(joiner);
@@ -24,18 +126,8 @@ function replaceJoinedArrayString(array, joiner, maxLength)
     return replacement;
 }
 
-function undefinedAsString(replacement)
-{
-    if (replacement === '[][[]]')
-        replacement += '+[]';
-    return replacement;
-}
-
 /**
- * Replaces a given array of strings with equivalent JSFuck code.
- *
- * Array elements may only contain characters with static definitions in their string
- * representations.
+ * Replaces a given array of statically replaceable strings with equivalent JSFuck code.
  *
  * @function Encoder#replaceStringArray
  *
@@ -44,7 +136,7 @@ function undefinedAsString(replacement)
  *
  * @param {Delimiter[]} insertions
  * An array of delimiters of which at most one will be used to compose a joined string and split it
- * into an array of strings.
+ * into an array of strings. Every joiner in the insertions must be a statically replaceable string.
  *
  * The encoder can pick an insertion and insert a joiner between any two adjacent elements to mark
  * the boundary between them. The separator is then used to split the concatenated string back into
@@ -92,139 +184,65 @@ export default function replaceStringArray
     // applied.
     if (substitutions || count > 2)
     {
-        var preReplacement =
-        function ()
-        {
-            // Length of the shortest string replacement "([]+[])".
-            var STRING_REPLACEMENT_MIN_LENGTH = 7;
-
-            // This is for the overhead of "[" + "](" + ")" plus the length of the shortest
-            // separator replacement "[]".
-            var SEPARATOR_MIN_OVERHEAD = 6;
-
-            // This is for the overhead of "[" + "](" + ")" plus the length of the shortest
-            // joiner replacement "[]".
-            var JOINER_MIN_OVERHEAD = 6;
-
-            var joinCount = substitutions ? substitutions.length : 0;
-            var splitCount = joinCount + 1;
-            var maxSplitReplacementLength =
-            (maxLength - STRING_REPLACEMENT_MIN_LENGTH) / splitCount - SEPARATOR_MIN_OVERHEAD;
-            var splitReplacement =
-            this.replaceString('split', { maxLength: maxSplitReplacementLength, optimize: true });
-            if (!splitReplacement)
-                return;
-            var preReplacement = '';
-            if (joinCount)
-            {
-                var maxJoinReplacementLength =
-                (
-                    maxLength - STRING_REPLACEMENT_MIN_LENGTH -
-                    splitCount * (splitReplacement.length + SEPARATOR_MIN_OVERHEAD)
-                ) /
-                joinCount -
-                JOINER_MIN_OVERHEAD;
-                var joinReplacement =
-                this.replaceString('join', { maxLength: maxJoinReplacementLength });
-                if (!joinReplacement)
-                    return;
-                substitutions.forEach
-                (
-                    function (substitution)
-                    {
-                        var separatorReplacement =
-                        undefinedAsString(this.replaceExpr(substitution.separator));
-                        var joinerReplacement =
-                        undefinedAsString(this.replaceString(substitution.joiner));
-                        preReplacement +=
-                        '[' + splitReplacement + '](' + separatorReplacement + ')[' +
-                        joinReplacement + '](' + joinerReplacement + ')';
-                    },
-                    this
-                );
-            }
-            preReplacement += '[' + splitReplacement + ']';
-            return preReplacement;
-        }
-        .call(this);
+        var splitReplacement = this.resolveConstant('SPLIT').replacement;
+        var minSubstitutionsReplacementLength =
+        maxLength -
+        SEQUENCE_MIN_LENGTH -
+        splitReplacement.length -
+        SEPARATION_MIN_OVERHEAD;
+        var substitutionsReplacement =
+        createSubstitutionsReplacement(this, substitutions, minSubstitutionsReplacementLength);
     }
-    if (!substitutions && count > 1)
-    {
-        var concatReplacement =
-        this.replaceString('concat', { maxLength: maxLength, optimize: true });
-    }
-    if (preReplacement)
+    if (substitutionsReplacement != null)
     // Approach 1: (array[0] + joiner + array[1] + joiner + array[2]...).split(separator)
     {
-        // 2 is for the additional overhead of "(" + ")".
-        var maxBulkLength = maxLength - (preReplacement.length + 2);
-        var optimalStrReplacement;
+        var maxBulkLength =
+        maxLength - substitutionsReplacement.length - splitReplacement.length -
+        SEPARATION_MIN_OVERHEAD + SEPARATOR_MIN_LENGTH;
+        var optimalSeqReplacement;
         var optimalSeparatorReplacement;
         insertions.forEach
         (
             function (insertion)
             {
-                var strReplacement =
+                var seqReplacement =
                 replaceJoinedArrayString(array, insertion.joiner, maxBulkLength);
-                if (!strReplacement)
+                if (!seqReplacement)
                     return;
                 var separatorReplacement = undefinedAsString(this.replaceExpr(insertion.separator));
-                var bulkLength = strReplacement.length + separatorReplacement.length;
+                var bulkLength = seqReplacement.length + separatorReplacement.length;
                 if (!(bulkLength > maxBulkLength))
                 {
                     maxBulkLength = bulkLength;
-                    optimalStrReplacement = strReplacement;
+                    optimalSeqReplacement = seqReplacement;
                     optimalSeparatorReplacement = separatorReplacement;
                 }
             },
             this
         );
-        if (optimalStrReplacement)
+        if (optimalSeqReplacement)
         {
             replacement =
-            optimalStrReplacement + preReplacement + '(' + optimalSeparatorReplacement + ')';
+            optimalSeqReplacement + substitutionsReplacement + '[' + splitReplacement + '](' +
+            optimalSeparatorReplacement + ')';
             maxLength = replacement.length - 1;
         }
     }
-    if
-    (
-        !substitutions &&
-        (
-            count <= 1 ||
-            concatReplacement &&
-            // 4 is the length of the shortest possible replacement "[[]]".
-            // 7 is the length of the shortest possible additional overhead for each following array
-            // element, as in "[" + "](+[])" or "[" + "](![])".
-            !(4 + (concatReplacement.length + 7) * (count - 1) > maxLength)
-        )
-    )
+    if (!substitutions)
     // Approach 2: [array[0]].concat(array[1]).concat(array[2])...
     {
-        var arrayReplacement;
-        var options = { screwMode: forceString ? SCREW_AS_STRING : SCREW_NORMAL };
-        if
-        (
-            !array.some
-            (
-                function (element)
-                {
-                    var elementReplacement =
-                    undefinedAsString(replaceStaticString(element, options));
-                    if (arrayReplacement)
-                    {
-                        if (elementReplacement === '[]')
-                            elementReplacement = allowZeroForEmptyElements ? '+[]' : '[[]]';
-                        arrayReplacement +=
-                        '[' + concatReplacement + '](' + elementReplacement + ')';
-                    }
-                    else
-                        arrayReplacement = '[' + elementReplacement + ']';
-                    var result = arrayReplacement.length > maxLength;
-                    return result;
-                }
-            )
-        )
+        var arrayReplacement =
+        createConcatenationReplacement
+        (this, array, allowZeroForEmptyElements, forceString, maxLength);
+        if (arrayReplacement)
             replacement = arrayReplacement;
     }
+    return replacement;
+}
+
+function undefinedAsString(replacement)
+{
+    if (replacement === '[][[]]')
+        replacement += '+[]';
     return replacement;
 }

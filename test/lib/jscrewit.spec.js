@@ -139,13 +139,30 @@ self,
             );
             it
             (
-                'returns undefined for too complex input',
+                'does not replace the mapper when maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    encoder.replaceFalseFreeArray = Function();
+                    var _replaceMapper = encoder._replaceMapper;
+                    encoder._replaceMapper =
+                    function () { expect(_replaceMapper).fail('not to be called'); };
                     var inputData = Object('12345');
-                    expect(encoder._encodeByCharCodes(inputData)).toBeUndefined();
+                    var output = encoder._encodeByCharCodes(inputData, 4, 6000);
+                    expect(output).toBeUndefined();
+                }
+            );
+            it
+            (
+                'does not replace the character array joining when maxLength is too small',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    var _joinCharArray = encoder._joinCharArray;
+                    encoder._joinCharArray =
+                    function () { expect(_joinCharArray).fail('not to be called'); };
+                    var inputData = Object('12345');
+                    var output = encoder._encodeByCharCodes(inputData, 4, 31000);
+                    expect(output).toBeUndefined();
                 }
             );
         }
@@ -261,57 +278,24 @@ self,
             );
             it
             (
-                'returns undefined for too complex input',
+                'returns undefined when maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output1 = encoder._encodeByDenseFigures(Object('12345'), 10);
-                    expect(output1).toBeUndefined();
-                    var output2 = encoder._encodeByDenseFigures(Object('12345'), 125);
-                    expect(output2).toBeUndefined();
-                    var output3 = encoder._encodeByDenseFigures(Object('12345'), 23500);
-                    expect(output3).toBeUndefined();
-                }
-            );
-            it
-            (
-                'uses an ad-hoc insertion for the figure legend',
-                function ()
-                {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    var figureLegendInsertions;
-                    encoder._callGetFigureLegendInsertions =
-                    function (getFigureLegendInsertions, figurator, figures)
+                    var input = 'aabbcc';
+                    var replaceStringArray = encoder.replaceStringArray;
+                    encoder.replaceStringArray =
+                    function (array)
                     {
-                        figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
-                        return figureLegendInsertions;
-                    };
-                    var inputData = Object('foo');
-                    encoder._encodeByDenseFigures(inputData);
-                    expect(figureLegendInsertions[1]).toEqual({ joiner: '0', separator: '0' });
-                }
-            );
-            it
-            (
-                'uses no ad-hoc insertion for the figure legend',
-                function ()
-                {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    var figureLegendInsertions;
-                    encoder._callGetFigureLegendInsertions =
-                    function (getFigureLegendInsertions, figurator, figures)
-                    {
-                        figurator =
-                        function ()
+                        if (array.length === input.length)
                         {
-                            return Object('');
-                        };
-                        figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
-                        return figureLegendInsertions;
+                            expect(replaceStringArray)
+                            .fail('not to be called with the input character figures');
+                        }
+                        return replaceStringArray.apply(this, arguments);
                     };
-                    var inputData = Object('foo');
-                    encoder._encodeByDenseFigures(inputData);
-                    expect(figureLegendInsertions.length).toBe(1);
+                    var output = encoder._encodeByDenseFigures(Object(input), 3000);
+                    expect(output).toBeUndefined();
                 }
             );
         }
@@ -390,16 +374,33 @@ self,
             );
             it
             (
-                'returns undefined for too complex input',
+                'does not create a mapping when maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output1 = encoder._encodeByDict(Object('12345'), undefined, undefined, 10);
-                    expect(output1).toBeUndefined();
-                    var output2 = encoder._encodeByDict(Object('12345'), undefined, undefined, 78);
-                    expect(output2).toBeUndefined();
-                    var output3 = encoder._encodeByDict(Object('12345'), undefined, undefined, 200);
-                    expect(output3).toBeUndefined();
+                    var resolveConstant = encoder.resolveConstant;
+                    encoder.resolveConstant =
+                    function (constant)
+                    {
+                        if (constant === 'MAP')
+                            expect(resolveConstant).fail('not to be called with argument "MAP"');
+                        return resolveConstant.apply(this, arguments);
+                    };
+                    var output = encoder._encodeByDict(Object('12345'), undefined, undefined, 3000);
+                    expect(output).toBeUndefined();
+                }
+            );
+            it
+            (
+                'does not replace the mapper when maxLength is too small',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    var _replaceMapper = encoder._replaceMapper;
+                    encoder._replaceMapper =
+                    function () { expect(_replaceMapper).fail('not to be called'); };
+                    var output = encoder._encodeByDict(Object('12345'), undefined, undefined, 4000);
+                    expect(output).toBeUndefined();
                 }
             );
         }
@@ -443,16 +444,33 @@ self,
             );
             it
             (
-                'returns undefined for too complex input',
+                'does not resolve a mapper when maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var output1 = encoder._encodeBySparseFigures(Object('12345'), 10);
-                    expect(output1).toBeUndefined();
-                    var output2 = encoder._encodeBySparseFigures(Object('12345'), 125);
-                    expect(output2).toBeUndefined();
-                    var output3 = encoder._encodeBySparseFigures(Object('12345'), 3700);
-                    expect(output3).toBeUndefined();
+                    var _findFormatMapperShort = encoder._findFormatMapperShort;
+                    encoder._findFormatMapperShort =
+                    function () { expect(_findFormatMapperShort).fail('not to be called'); };
+                    var output = encoder._encodeBySparseFigures(Object('12345'), 7000);
+                    expect(output).toBeUndefined();
+                }
+            );
+            it
+            (
+                'does not replace the create a mapping when maxLength is too small',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    var resolveConstant = encoder.resolveConstant;
+                    encoder.resolveConstant =
+                    function (constant)
+                    {
+                        if (constant === 'MAP')
+                            expect(resolveConstant).fail('not to be called with argument "MAP"');
+                        return resolveConstant.apply(this, arguments);
+                    };
+                    var output = encoder._encodeBySparseFigures(Object('12345'), 7900);
+                    expect(output).toBeUndefined();
                 }
             );
         }
@@ -659,23 +677,6 @@ self,
     );
     describe
     (
-        'Encoder#replaceFalseFreeArray',
-        function ()
-        {
-            it
-            (
-                'returns undefined for too large array',
-                function ()
-                {
-                    var encoder = JScrewIt.debug.createEncoder();
-                    encoder.replaceString = Function();
-                    expect(encoder.replaceFalseFreeArray([1, 2])).toBeUndefined();
-                }
-            );
-        }
-    );
-    describe
-    (
         'Encoder#replaceString',
         function ()
         {
@@ -851,91 +852,167 @@ self,
             );
             it
             (
-                'does not replace "split" and "concat" when maxLength is low',
+                'does not replace the input with the split approach when maxLength is less than ' +
+                'the replacement length',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var replaceString = encoder.replaceString;
-                    var splitReplacement = null;
-                    var concatReplacement = null;
-                    encoder.replaceString =
-                    function (str)
-                    {
-                        var replaceResult = replaceString.apply(this, arguments);
-                        if (str === 'split')
-                            splitReplacement = replaceResult;
-                        else if (str === 'concat')
-                            concatReplacement = replaceResult;
-                        return replaceResult;
-                    };
+                    var replacement =
                     encoder.replaceStringArray
                     (
-                        ['', '', '', ''],
+                        ['1', '2', '3', '4', '5'],
+                        [{ separator: 'false', joiner: 'false' }],
+                        [{ separator: '1', joiner: '0' }],
+                        false,
+                        false
+                    );
+                    expect(evalJSFuck(replacement)).toEqual(['0', '2', '3', '4', '5']);
+                    var replacement0 =
+                    encoder.replaceStringArray
+                    (
+                        ['1', '2', '3', '4', '5'],
+                        [{ separator: 'false', joiner: 'false' }],
+                        [{ separator: '1', joiner: '0' }],
+                        false,
+                        false,
+                        replacement.length - 1
+                    );
+                    expect(replacement0).toBeUndefined();
+                    var replacement1 =
+                    encoder.replaceStringArray
+                    (
+                        ['1', '2', '3', '4', '5'],
+                        [{ separator: 'false', joiner: 'false' }],
+                        [{ separator: '1', joiner: '0' }],
+                        false,
+                        false,
+                        replacement.length
+                    );
+                    expect(replacement1).toBe(replacement);
+                }
+            );
+            it
+            (
+                'does not replace the input with the concat approach when maxLength is less than ' +
+                'the replacement length',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    var replacement =
+                    encoder.replaceStringArray
+                    (
+                        ['1', '2'],
+                        [{ separator: 'false', joiner: 'false' }],
+                        null,
+                        false,
+                        false
+                    );
+                    expect(evalJSFuck(replacement)).toEqual([1, 2]);
+                    var replacement0 =
+                    encoder.replaceStringArray
+                    (
+                        ['1', '2'],
                         [{ separator: 'false', joiner: 'false' }],
                         null,
                         false,
                         false,
-                        0
+                        replacement.length - 1
                     );
-                    expect(splitReplacement).toBeUndefined();
-                    expect(concatReplacement).toBeUndefined();
+                    expect(replacement0).toBeUndefined();
+                    var replacement1 =
+                    encoder.replaceStringArray
+                    (
+                        ['1', '2'],
+                        [{ separator: 'false', joiner: 'false' }],
+                        null,
+                        false,
+                        false,
+                        replacement.length
+                    );
+                    expect(replacement1).toBe(replacement);
                 }
             );
             it
             (
-                'does not replace "join" when maxLength is low',
+                'does not replace substitutions when maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
-                    var replaceString = encoder.replaceString;
-                    var joinReplacement = null;
-                    encoder.replaceString =
-                    function (str)
-                    {
-                        var replaceResult = replaceString.apply(this, arguments);
-                        if (str === 'join')
-                            joinReplacement = replaceResult;
-                        return replaceResult;
-                    };
                     encoder.replaceStringArray
                     (
-                        [''],
-                        [{ separator: 'false', joiner: 'false' }],
-                        [{ separator: '0', joiner: '1' }],
+                        ['UNREPLACEABLE'],
+                        [{ separator: 'UNDEFINED', joiner: 'UNREPLACEABLE' }],
+                        [{ separator: 'UNDEFINED', joiner: '' }],
                         false,
                         false,
-                        7000
+                        9000
                     );
-                    expect(joinReplacement).toBeUndefined();
                 }
             );
             it
             (
-                'does not replace the input when maxLength is low',
+                'does not replace the input with the split approach with substitutions when ' +
+                'maxLength is too small',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    encoder.replaceStringArray
+                    (
+                        ['UNREPLACEABLE'],
+                        [{ separator: 'UNDEFINED', joiner: 'UNREPLACEABLE' }],
+                        [{ separator: '0', joiner: 'y' }],
+                        false,
+                        false,
+                        9200
+                    );
+                }
+            );
+            it
+            (
+                'does not replace the input with the split approach without substitutions when ' +
+                'maxLength is too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
                     var output =
                     encoder.replaceStringArray
                     (
-                        repeat('0', 50).split(''),
-                        [{ separator: '[]', joiner: '' }],
+                        ['UNREPLACEABLE'],
+                        [{ separator: 'UNDEFINED', joiner: 'UNREPLACEABLE' }],
                         [],
                         false,
                         false,
-                        3500
+                        1000
                     );
                     expect(output).toBeUndefined();
                 }
             );
             it
             (
-                'does not replace a single element with the concat approach when maxLength is low',
+                'does not replace a single element with the concat approach when maxLength is ' +
+                'too small',
                 function ()
                 {
                     var encoder = JScrewIt.debug.createEncoder();
                     var output = encoder.replaceStringArray([''], [], null, false, false, 0);
                     expect(output).toBeUndefined();
+                }
+            );
+            it
+            (
+                'throws an error for an array with non-statically replaceable elements',
+                function ()
+                {
+                    var encoder = JScrewIt.debug.createEncoder();
+                    expect
+                    (
+                        function ()
+                        {
+                            encoder.replaceStringArray
+                            (['UNREPLACEABLE'], [{ separator: '[]', joiner: '' }], null);
+                        }
+                    )
+                    .toThrowStrictly(Error, 'Unable to resolve "U" statically');
                 }
             );
         }

@@ -703,7 +703,7 @@ function getFHPaddingEntries(index)
         ',':
         [
             define('(RP_0_S + F_A_L_S_E)[1]'),
-            define({ expr: '[[]].concat([[]])', solutionType: SolutionType.OBJECT }),
+            define({ expr: '[[]][CONCAT]([[]])', solutionType: SolutionType.OBJECT }),
         ],
         '-': '(.0000001 + [])[2]',
         '.': '(11e20 + [])[1]',
@@ -1084,7 +1084,7 @@ function getFHPaddingEntries(index)
         RegExp:         define({ expr: 'RegExp.name', optimize: { complexOpt: false } }, NAME),
         String:         define('String.name', NAME),
         fromCharCo:
-        define({ expr: '"from3har3o".split(3).join("C")', optimize: { complexOpt: false } }),
+        define({ expr: '"from3har3o"[SPLIT](3)[JOIN]("C")', optimize: { complexOpt: false } }),
         mCh:            define('atob("bUNo")'),
     }); // eslint-disable-line @origin-1/bracket-layout
 
@@ -1174,10 +1174,11 @@ function getFHPaddingEntries(index)
         [
             define('[].at', AT),
         ],
-        FILTER:
+        CONCAT:
         [
-            define('[].filter'),
+            define({ expr: '"concat"', solutionType: SolutionType.COMBINED_STRING }),
         ],
+        FILTER:     '[].filter',
         FLAT:
         [
             define('[].flat', FLAT),
@@ -1186,10 +1187,18 @@ function getFHPaddingEntries(index)
         [
             define('[][SLICE_OR_FLAT].call("false")'),
         ],
+        JOIN:
+        [
+            define({ expr: '"join"', solutionType: SolutionType.COMBINED_STRING }),
+        ],
         LOCALE_AR:
         [
             define({ expr: '"ar-td"', solutionType: SolutionType.COMBINED_STRING }),
             define({ expr: '"ar"', solutionType: SolutionType.COMBINED_STRING }, SHORT_LOCALES),
+        ],
+        MAP:
+        [
+            define({ expr: '"map"', optimize: true, solutionType: SolutionType.COMBINED_STRING }),
         ],
         PLAIN_OBJECT:
         [
@@ -1208,6 +1217,10 @@ function getFHPaddingEntries(index)
         [
             define({ expr: '"slice"', solutionType: SolutionType.COMBINED_STRING }),
             define({ expr: '"substr"', solutionType: SolutionType.COMBINED_STRING }),
+        ],
+        SPLIT:
+        [
+            define({ expr: '"split"', optimize: true, solutionType: SolutionType.COMBINED_STRING }),
         ],
         TO_LOCALE_STRING:
         [

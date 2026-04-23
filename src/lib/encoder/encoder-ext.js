@@ -20,6 +20,7 @@ from '../definitions';
 import expressParse                         from '../express-parse';
 import { Feature }                          from '../features';
 import createFigurator                      from '../figurator';
+import joinWithMaxLength                    from '../join-with-max-length';
 import
 {
     _Array_prototype_forEach_call,
@@ -47,6 +48,12 @@ var ENCODING_TYPE_TEXT          = 'text';
 
 var FALSE_FREE_DELIMITER = { joiner: 'false', separator: 'false' };
 var FALSE_TRUE_DELIMITER = { joiner: '', separator: 'Function("return/(?=false|true)/")()' };
+
+// Underestimated minimum length of the joining: "[" + joinReplacement + "]([])".
+var JOINING_MIN_LENGTH      = 8;
+
+// Underestimated minimum overhead of the mapping: "[" + "](" + mapperReplacement + ")".
+var MAPPING_MIN_OVERHEAD    = 12;
 
 var REPLACERS =
 {
@@ -145,23 +152,62 @@ function createCharKeyArrayString
     return charKeyArrayStr;
 }
 
-function createJSFuckArrayMapping(encoder, arrayStr, mapper, legend)
+function createLongStrCodesOutput(encoder, arrayReplacement, fromCharCode, arg, maxLength)
 {
-    var result =
-    arrayStr + '[' + encoder.replaceString('map', { optimize: true }) + '](' +
-    encoder.replaceExpr(mapper, true) + '(' + legend + '))';
-    return result;
-}
-
-function createLongStrCodesOutput(encoder, strCodeArrayStr, fromCharCode, arg)
-{
+    var mapReplacement = encoder.resolveConstant('MAP').replacement;
+    var maxCharArrayLength = maxLength - JOINING_MIN_LENGTH;
+    var maxMapReplacementLength =
+    maxCharArrayLength - arrayReplacement.length - MAPPING_MIN_OVERHEAD;
+    if (mapReplacement.length > maxMapReplacementLength)
+        return;
     var formatter = encoder.findDefinition(FROM_CHAR_CODE_CALLBACK_FORMATTER);
     var formatterExpr = formatter(fromCharCode, arg);
-    var output =
-    strCodeArrayStr + '[' + encoder.replaceString('map', { optimize: true }) + '](' +
-    encoder.replaceExpr('Function("return ' + formatterExpr + '")()', true) + ')[' +
-    encoder.replaceString('join') + ']([])';
-    return output;
+    var mapper = 'Function("return ' + formatterExpr + '")()';
+    var mapperReplacement = encoder._replaceMapper(mapper);
+    var charArrayReplacement =
+    joinWithMaxLength
+    (
+        maxCharArrayLength,
+        arrayReplacement,
+        '[',
+        mapReplacement,
+        '](',
+        mapperReplacement,
+        ')'
+    );
+    if (!charArrayReplacement)
+        return;
+    var replacement = encoder._joinCharArray(charArrayReplacement, maxLength);
+    return replacement;
+}
+
+function createMappedArrayEncoding(encoder, arrayReplacement, mapper, legend, maxLength)
+{
+    var mapReplacement = encoder.resolveConstant('MAP').replacement;
+    var maxCharArrayLength = maxLength - JOINING_MIN_LENGTH;
+    var maxMapReplacementLength =
+    // 2 is for the calling parentheses around the legend replacement.
+    maxCharArrayLength - arrayReplacement.length - MAPPING_MIN_OVERHEAD - legend.length - 2;
+    if (mapReplacement.length > maxMapReplacementLength)
+        return;
+    var mapperReplacement = encoder._replaceMapper(mapper);
+    var charArrayReplacement =
+    joinWithMaxLength
+    (
+        maxCharArrayLength,
+        arrayReplacement,
+        '[',
+        mapReplacement,
+        '](',
+        mapperReplacement,
+        '(',
+        legend,
+        '))'
+    );
+    if (!charArrayReplacement)
+        return;
+    var replacement = encoder._joinCharArray(charArrayReplacement, maxLength);
+    return replacement;
 }
 
 export function createReindexMap(count, radix, amendingCount, coerceToInt)
@@ -229,41 +275,58 @@ function createStrCodesEncoding(encoder, inputData, fromCharCode, splitter, radi
     var strCodeCacheKey = 'strCodeCache' + (radix ? 'Radix' + radix : '');
     var cache = inputData[strCodeCacheKey] || (inputData[strCodeCacheKey] = createEmpty());
     var strCodeArray = splitter(input, radix, cache);
-    var strCodeArrayStr = encoder.replaceFalseFreeArray(strCodeArray, maxLength);
+    var strCodeArrayStr =
+    encoder.replaceStringArray(strCodeArray, [FALSE_FREE_DELIMITER], null, false, false, maxLength);
     if (strCodeArrayStr)
     {
-        var output;
+        var replacement;
         if (radix)
         {
-            output =
+            replacement =
             createLongStrCodesOutput
-            (encoder, strCodeArrayStr, fromCharCode, 'parseInt(undefined,' + radix + ')');
+            (
+                encoder,
+                strCodeArrayStr,
+                fromCharCode,
+                'parseInt(undefined,' + radix + ')',
+                maxLength
+            );
         }
         else
         {
             var long = strCodeArray.length > encoder._maxDecodableArgs;
             if (long)
             {
-                output =
-                createLongStrCodesOutput(encoder, strCodeArrayStr, fromCharCode, 'undefined');
+                replacement =
+                createLongStrCodesOutput
+                (
+                    encoder,
+                    strCodeArrayStr,
+                    fromCharCode,
+                    'undefined',
+                    maxLength
+                );
             }
             else
             {
                 var returnString = encoder.findDefinition(OPTIMAL_RETURN_STRING);
                 var str = returnString + '.' + fromCharCode + '(';
-                output =
-                encoder.resolveConstant('Function').replacement +
-                '(' +
-                encoder.replaceString(str, { optimize: true }) +
-                '+' +
-                strCodeArrayStr +
-                '+' +
-                encoder.resolveCharacter(')').replacement +
-                ')()';
+                replacement =
+                joinWithMaxLength
+                (
+                    maxLength,
+                    encoder.resolveConstant('Function').replacement,
+                    '(',
+                    encoder.replaceString(str, { optimize: true }),
+                    '+',
+                    strCodeArrayStr,
+                    '+',
+                    encoder.resolveCharacter(')').replacement,
+                    ')()'
+                );
             }
         }
-        if (!(output.length > maxLength))
-            return output;
+        return replacement;
     }
 }
 
@@ -322,8 +385,7 @@ function encodeByDblDict
     var legend = encodeDictLegend(encoder, dictChars, maxLength - minCharIndexArrayStrLength);
     if (!legend)
         return;
-    var figureLegendInsertions =
-    encoder._callGetFigureLegendInsertions(getFigureLegendInsertions, figurator, figures);
+    var figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
     var figureMaxLength = maxLength - legend.length;
     var figureLegend =
     encoder.replaceStringArray
@@ -457,13 +519,6 @@ function initMinFalseFreeCharIndexArrayStrLength(input)
 function initMinFalseTrueCharIndexArrayStrLength()
 {
     return -1;
-}
-
-function joinArrayStr(encoder, arrayStr, maxLength)
-{
-    var output = arrayStr + '[' + encoder.replaceString('join') + ']([])';
-    if (!(output.length > maxLength))
-        return output;
 }
 
 function splitIntoCharCodes(str, radix, cache)
@@ -1013,30 +1068,36 @@ assignNoEnum
 (
     Encoder.prototype,
     {
-        _callGetFigureLegendInsertions:
-        function (getFigureLegendInsertions, figurator, figures)
-        {
-            var figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
-            return figureLegendInsertions;
-        },
-
         _createDblDictEncoding:
         function (formatMapper, charIndexFigureArrayStr, figureLegend, legend, maxLength)
         {
             var argName = formatMapper.argName;
             var accessor = '.indexOf(' + argName + ')';
             var mapper = formatMapper(accessor);
-            var concatReplacement = this.replaceString('concat', { optimize: true });
+            var concatReplacement = this.resolveConstant('CONCAT').replacement;
+            var maxCombinedLegendLength = maxLength - charIndexFigureArrayStr.length - 10;
             var combinedLegend =
-            '[' + figureLegend + '][' + concatReplacement + '](' + legend + ')';
-            var charIndexArrayStr =
-            createJSFuckArrayMapping(this, charIndexFigureArrayStr, mapper, combinedLegend);
-            var output = joinArrayStr(this, charIndexArrayStr, maxLength);
-            return output;
+            joinWithMaxLength
+            (
+                maxCombinedLegendLength,
+                '[',
+                figureLegend,
+                '][',
+                concatReplacement,
+                '](',
+                legend,
+                ')'
+            );
+            if (!combinedLegend)
+                return;
+            var replacement =
+            createMappedArrayEncoding
+            (this, charIndexFigureArrayStr, mapper, combinedLegend, maxLength);
+            return replacement;
         },
 
         _createDictEncoding:
-        function (charIndexArrayStr, legend, maxLength, radix, coerceToInt)
+        function (charIndexArrayStr, legend, radix, coerceToInt, maxLength)
         {
             var mapper;
             if (radix)
@@ -1049,9 +1110,9 @@ assignNoEnum
             }
             else
                 mapper = '"".charAt.bind';
-            var arrayStr = createJSFuckArrayMapping(this, charIndexArrayStr, mapper, legend);
-            var output = joinArrayStr(this, arrayStr, maxLength);
-            return output;
+            var replacement =
+            createMappedArrayEncoding(this, charIndexArrayStr, mapper, legend, maxLength);
+            return replacement;
         },
 
         _encodeByCharCodes:
@@ -1148,7 +1209,7 @@ assignNoEnum
             if (!charIndexArrayStr)
                 return;
             var output =
-            this._createDictEncoding(charIndexArrayStr, legend, maxLength, radix, coerceToInt);
+            this._createDictEncoding(charIndexArrayStr, legend, radix, coerceToInt, maxLength);
             return output;
         },
 
@@ -1207,16 +1268,22 @@ assignNoEnum
             return formatMapper;
         },
 
+        _joinCharArray:
+        function (charArrayReplacement, maxLength)
+        {
+            var joinReplacement = this.resolveConstant('JOIN').replacement;
+            var replacement =
+            joinWithMaxLength(maxLength, charArrayReplacement, '[', joinReplacement, ']([])');
+            return replacement;
+        },
+
         _maxDecodableArgs:  65533, // Limit imposed by Internet Explorer.
 
-        // Array elements may not contain the substring "false", because the value false could be
-        // used as a separator in the encoding.
-        replaceFalseFreeArray:
-        function (array, maxLength)
+        _replaceMapper:
+        function (mapper)
         {
-            var result =
-            this.replaceStringArray(array, [FALSE_FREE_DELIMITER], null, false, false, maxLength);
-            return result;
+            var mapperReplacement = this.replaceExpr(mapper, true);
+            return mapperReplacement;
         },
 
         replaceStringArray: replaceStringArray,
