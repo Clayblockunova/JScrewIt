@@ -59,12 +59,23 @@ self,
 
     function isExpected(expected)
     {
-        var result =
+        var validator =
         function ()
         {
             this.toBe(expected);
         };
-        return result;
+        return validator;
+    }
+
+    function isExpectedBooleanOrUndefined()
+    {
+        var validator =
+        function ()
+        {
+            this.toBeBooleanOrUndefined();
+        };
+        validator.expectedComputedTypes = SolutionType.UNDEFINED | SolutionType.ALGEBRAIC;
+        return validator;
     }
 
     function testCharacter(charCode)
@@ -274,7 +285,7 @@ self,
         );
     }
 
-    function testConstant(constant, validator, expectedSolutionTypes)
+    function testConstant(constant, validator, namedSolutionTypes)
     {
         var entries = JScrewIt.debug.getConstantEntries(constant);
         entries.forEach
@@ -293,14 +304,12 @@ self,
                         var replacement = solution.replacement;
                         expect(replacement).toBeJSFuck();
                         expect(solution.source).toBeUndefined();
-                        var currentExpectedSolutionTypes;
-                        if (expectedSolutionTypes)
-                        {
-                            expect(expectedSolutionTypes).toContain(solution.type);
-                            currentExpectedSolutionTypes = expectedSolutionTypes;
-                        }
-                        else
-                            currentExpectedSolutionTypes = [solution.type];
+                        var definedSolutionType = solution.type;
+                        if (namedSolutionTypes)
+                            expect(namedSolutionTypes).toContain(definedSolutionType);
+                        if (validator)
+                            var expectedComputedTypes = validator.expectedComputedTypes;
+                        expectedComputedTypes = expectedComputedTypes || definedSolutionType;
                         emuDo
                         (
                             this.test.emuFeatureNames,
@@ -309,10 +318,14 @@ self,
                                 var actual = evalJSFuck(replacement);
                                 if (validator)
                                     validator.call(expect(actual));
-                                var computedSolutionType =
+                                var actualComputedType =
                                 JScrewIt.debug.calculateSolutionType(replacement);
-                                expect(currentExpectedSolutionTypes)
-                                .toContain(computedSolutionType, 'Solution type mismatch');
+                                expect(actualComputedType)
+                                .toBe
+                                (
+                                    expectedComputedTypes & actualComputedType,
+                                    'Solution type mismatch'
+                                );
                             }
                         );
                     }
@@ -334,8 +347,9 @@ self,
             {
                 var actual = String(evalJSFuck(replacement));
                 expect(actual).toBe(expected);
-                var computedSolutionType = JScrewIt.debug.calculateSolutionType(replacement);
-                expect(solution.type).toBe(computedSolutionType, 'Solution type mismatch');
+                var expectedComputedType = solution.type;
+                var actualComputedType = JScrewIt.debug.calculateSolutionType(replacement);
+                expect(actualComputedType).toBe(expectedComputedType, 'Solution type mismatch');
             }
         );
     }
@@ -405,30 +419,30 @@ self,
         {
             var paramDataMap =
             {
-                Array:      isExpected(Array),
-                Boolean:    isExpected(Boolean),
-                Function:   isExpected(Function),
+                Array:          isExpected(Array),
+                Boolean:        isExpected(Boolean),
+                Function:       isExpected(Function),
                 Intl:
                 function ()
                 {
                     this.toBe(Intl);
                 },
-                Number:     isExpected(Number),
-                Object:     isExpected(Object),
-                RegExp:     isExpected(RegExp),
-                String:     isExpected(String),
+                Number:         isExpected(Number),
+                Object:         isExpected(Object),
+                RegExp:         isExpected(RegExp),
+                String:         isExpected(String),
                 document:
                 function ()
                 {
                     this.toBe(document);
                 },
-                escape:     isExpected(escape),
+                escape:         isExpected(escape),
                 self:
                 function ()
                 {
                     this.toBe(self);
                 },
-                unescape:   isExpected(unescape),
+                unescape:       isExpected(unescape),
                 ANY_FUNCTION:
                 function ()
                 {
@@ -445,6 +459,8 @@ self,
                 {
                     this.toBe(Array.prototype.at);
                 },
+                FBEP_9_U:       isExpectedBooleanOrUndefined(),
+                FBP_9_U:        isExpectedBooleanOrUndefined(),
                 FILTER:
                 function ()
                 {
@@ -491,16 +507,8 @@ self,
                 {
                     this.toMatch(/^(?:slice|substr)$/);
                 },
-                TO_STRING:
-                function ()
-                {
-                    this.toBe('toString');
-                },
-                TO_UPPER_CASE:
-                function ()
-                {
-                    this.toBe('toUpperCase');
-                },
+                TO_STRING:      isExpected('toString'),
+                TO_UPPER_CASE:  isExpected('toUpperCase'),
             };
             var paramDataList =
             JScrewIt.debug.getConstantNames().map
@@ -519,16 +527,16 @@ self,
                 function (paramData)
                 {
                     var constant = paramData.constant;
-                    var expectedSolutionTypes;
+                    var namedSolutionTypes;
                     if (/_U$/.test(constant))
-                        expectedSolutionTypes = [SolutionType.UNDEFINED, SolutionType.ALGEBRAIC];
+                        namedSolutionTypes = [SolutionType.UNDEFINED, SolutionType.ALGEBRAIC];
                     else if (/_A$/.test(constant))
-                        expectedSolutionTypes = [SolutionType.ALGEBRAIC];
+                        namedSolutionTypes = [SolutionType.ALGEBRAIC];
                     else if (/_WA$/.test(constant))
-                        expectedSolutionTypes = [SolutionType.WEAK_ALGEBRAIC];
+                        namedSolutionTypes = [SolutionType.WEAK_ALGEBRAIC];
                     else if (/_S$/.test(constant))
                     {
-                        expectedSolutionTypes =
+                        namedSolutionTypes =
                         [
                             SolutionType.OBJECT,
                             SolutionType.PREFIXED_STRING,
@@ -536,8 +544,8 @@ self,
                         ];
                     }
                     else if (/_WS$/.test(constant))
-                        expectedSolutionTypes = [SolutionType.WEAK_PREFIXED_STRING];
-                    testConstant(constant, paramData.validator, expectedSolutionTypes);
+                        namedSolutionTypes = [SolutionType.WEAK_PREFIXED_STRING];
+                    testConstant(constant, paramData.validator, namedSolutionTypes);
                 }
             );
         }

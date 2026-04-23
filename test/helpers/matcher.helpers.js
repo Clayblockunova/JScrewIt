@@ -26,6 +26,17 @@
                 return this.assertions.pass(message);
             this.assertions.fail(message);
         },
+        toBeBooleanOrUndefined:
+        function ()
+        {
+            var actual = this.value;
+            var message = this.generateMessage(actual, this.expr, 'to be a boolean or undefined');
+            var actualType = typeof actual;
+            var pass = actualType === 'boolean' || actualType === 'undefined';
+            if (pass)
+                return this.assertions.pass(message);
+            this.assertions.fail(message);
+        },
         toBeJSFuck:
         function ()
         {
