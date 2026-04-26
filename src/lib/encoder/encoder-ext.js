@@ -1196,7 +1196,7 @@ assignNoEnum
                 perfInfo.perfLog = perfLog;
             delete this.perfLog;
             if (output == null)
-                throw new _Error('Encoding failed');
+                throw _Error('Encoding failed');
             return output;
         },
 

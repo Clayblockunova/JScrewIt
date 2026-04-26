@@ -58,7 +58,7 @@ function filterRunAs(input, name)
     case 'none':
         return [, STRATEGY_NAMES_TEXT];
     }
-    throw new _Error('Invalid value for option ' + name);
+    throw _Error('Invalid value for option ' + name);
 }
 
 function flushEncoderCache()

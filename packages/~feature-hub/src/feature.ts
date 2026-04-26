@@ -344,7 +344,7 @@ FeatureConstructor
     function validateMask(mask: Mask): void
     {
         if (!isMaskCompatible(mask))
-            throw new _Error('Incompatible features');
+            throw _Error('Incompatible features');
     }
 
     let utilInspect: typeof util.inspect | undefined;
@@ -663,7 +663,7 @@ const createMap = <T>(): Record<string, T> => _Object_create(null) as { };
 function esToString(name: unknown): string
 {
     if (typeof name === 'symbol')
-        throw new _TypeError('Cannot convert a symbol to a string');
+        throw _TypeError('Cannot convert a symbol to a string');
     const str = _String(name);
     return str;
 }
@@ -725,7 +725,7 @@ string
 
 function throwUnknownFeatureError(name: string): never
 {
-    throw new _Error(`Unknown feature ${_JSON_stringify(name)}`);
+    throw _Error(`Unknown feature ${_JSON_stringify(name)}`);
 }
 
 function wrapCheck(check: () => unknown): () => boolean

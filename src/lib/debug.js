@@ -108,7 +108,7 @@ if (typeof NO_DEBUG === 'undefined')
         {
             constant = _String(constant);
             if (!/^[$A-Z_a-z][$\w]*$/.test(constant))
-                throw new _SyntaxError('Invalid identifier ' + _JSON_stringify(constant));
+                throw _SyntaxError('Invalid identifier ' + _JSON_stringify(constant));
             if (!encoder.hasOwnProperty('constantDefinitions'))
                 encoder.constantDefinitions = _Object_create(CONSTANTS);
             var entries = [define(esToString(definition))];

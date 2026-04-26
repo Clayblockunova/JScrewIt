@@ -72,7 +72,7 @@ function callResolver(encoder, stackName, resolver)
             var chain = stack.slice(stackIndex);
             var feature = featureFromMask(encoder.mask);
             var message = 'Circular reference detected: ' + chain.join(' < ') + ' – ' + feature;
-            var error = new _SyntaxError(message);
+            var error = _SyntaxError(message);
             assignNoEnum(error, { chain: chain, feature: feature });
             throw error;
         }
@@ -291,7 +291,7 @@ function throwSyntaxError(encoder, message)
     var stackLength = stack.length;
     if (stackLength)
         message += ' in the definition of ' + stack[stackLength - 1];
-    throw new _SyntaxError(message);
+    throw _SyntaxError(message);
 }
 
 var matchSimpleAt =
