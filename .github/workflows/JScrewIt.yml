@@ -19,7 +19,6 @@ jobs:
       with:
         node-version: '24'
     - run: |
-        npm install --workspaces
         npm install
         npm run --workspaces make
         gulp lint
