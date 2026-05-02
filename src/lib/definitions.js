@@ -671,10 +671,7 @@ function getFHPaddingEntries(index)
         [
             define('"".fontcolor()[12]'),
         ],
-        '#':
-        [
-            defineCharDefault(),
-        ],
+        // '#':
         // '$'
         '%':
         [
@@ -772,6 +769,7 @@ function getFHPaddingEntries(index)
         'E':
         [
             define('btoa("0NaN")[1]'),
+            define('escape(RP_4_A + "".italics())[10]'),
             define('(RP_5_A + "".link())[10]', CAPITAL_HTML),
         ],
         'F':

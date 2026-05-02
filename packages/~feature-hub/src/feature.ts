@@ -350,11 +350,11 @@ FeatureConstructor
     let utilInspect: typeof util.inspect | undefined;
     try
     {
-        /* eslint-disable @typescript-eslint/no-require-imports, n/prefer-node-protocol */
+        /* eslint-disable @typescript-eslint/no-require-imports */
 
-        utilInspect = (require('util') as typeof util).inspect;
+        utilInspect = (require('node:util') as typeof util).inspect;
 
-        /* eslint-enable @typescript-eslint/no-require-imports, n/prefer-node-protocol */
+        /* eslint-enable @typescript-eslint/no-require-imports */
     }
     catch
     { }
