@@ -269,13 +269,13 @@ verify['BASE64_ALPHABET_LO_4:1'] = verifyPredef('BASE64_ALPHABET_LO_4:1');
 
 verify['BASE64_ALPHABET_LO_4:3'] = verifyPredef('BASE64_ALPHABET_LO_4:3');
 
+verify.FORMAT_MAPPER_LONG = verifyPredef('FORMAT_MAPPER_LONG');
+
+verify.FORMAT_MAPPER_SHORT = verifyPredef('FORMAT_MAPPER_SHORT');
+
 verify.FROM_CHAR_CODE = verifyPredef('FROM_CHAR_CODE');
 
 verify.FROM_CHAR_CODE_CALLBACK_FORMATTER = verifyPredef('FROM_CHAR_CODE_CALLBACK_FORMATTER');
-
-verify.MAPPER_FORMATTER = verifyPredef('MAPPER_FORMATTER');
-
-verify.OPTIMAL_ARG_NAME = verifyPredef('OPTIMAL_ARG_NAME');
 
 verify.OPTIMAL_B = verifyPredef('OPTIMAL_B');
 

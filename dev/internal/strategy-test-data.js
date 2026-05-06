@@ -132,7 +132,7 @@ module.exports =
     ),
     data
     (
-        ['ARRAY_ITERATOR', 'ARROW', 'AT', 'CAPITAL_HTML', 'V8_SRC'],
+        ['ARRAY_ITERATOR', 'ARROW', 'AT', 'CAPITAL_HTML', 'FF_SRC'],
         length =>
         {
             const postfix = repeatToFit('01234567', 491);
@@ -255,8 +255,8 @@ module.exports =
     ),
     data
     (
-        ['ARRAY_ITERATOR', 'ARROW', 'AT', 'CAPITAL_HTML', 'NAME', 'NO_IE_SRC'],
-        createDictTestString.bind(null, 42),
+        ['ARROW', 'AT', 'CAPITAL_HTML', 'FF_SRC', 'FROM_CODE_POINT', 'ITERATOR_HELPER', 'NAME'],
+        createDictTestString.bind(null, 32),
         'bySparseFigures',
     ),
 ];

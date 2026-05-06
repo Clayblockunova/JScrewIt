@@ -13,6 +13,7 @@ import { Feature }                                              from '../feature
 import
 {
     _Array_isArray,
+    _Error,
     _JSON_stringify,
     _Math_abs,
     _Object_create,
@@ -21,6 +22,7 @@ import
     _SyntaxError,
     assignNoEnum,
     createEmpty,
+    noop,
     tryCreateRegExp,
 }
 from '../obj-utils';
@@ -72,7 +74,7 @@ function callResolver(encoder, stackName, resolver)
             var chain = stack.slice(stackIndex);
             var feature = featureFromMask(encoder.mask);
             var message = 'Circular reference detected: ' + chain.join(' < ') + ' – ' + feature;
-            var error = new _SyntaxError(message);
+            var error = _SyntaxError(message);
             assignNoEnum(error, { chain: chain, feature: feature });
             throw error;
         }
@@ -291,7 +293,7 @@ function throwSyntaxError(encoder, message)
     var stackLength = stack.length;
     if (stackLength)
         message += ' in the definition of ' + stack[stackLength - 1];
-    throw new _SyntaxError(message);
+    throw _SyntaxError(message);
 }
 
 var matchSimpleAt =
@@ -385,6 +387,8 @@ assignNoEnum
                 return paddingBlock;
             throwSyntaxError(this, 'Undefined regular padding block with length ' + length);
         },
+
+        _guardResolution:       noop,
 
         _replaceCharByAtob:     replaceCharByAtob,
 
@@ -594,11 +598,9 @@ assignNoEnum
             var firstSolution = options.firstSolution;
             var maxLength = options.maxLength;
             if (firstSolution)
-            {
                 buffer.append(firstSolution);
-                if (buffer.length > maxLength)
-                    return;
-            }
+            if (buffer.length > maxLength)
+                return;
             var length = str.length;
             for (var index = 0; index < length;)
             {
@@ -661,15 +663,17 @@ assignNoEnum
             var solution = charCache[char];
             if (solution === undefined)
             {
+                var charName = _JSON_stringify(char);
                 callResolver
                 (
                     this,
-                    _JSON_stringify(char),
+                    charName,
                     function ()
                     {
                         var entries = CHARACTERS[char];
                         if (!entries || _Array_isArray(entries))
                         {
+                            this._guardResolution(charName);
                             if (entries)
                                 solution = findOptimalSolution(this, char, entries);
                             if (!solution)
@@ -704,6 +708,7 @@ assignNoEnum
                         var entries = this.constantDefinitions[constant];
                         if (_Array_isArray(entries))
                         {
+                            this._guardResolution(constant);
                             solution =
                             findOptimalSolution(this, constant, entries, SolutionType.OBJECT);
                         }
@@ -721,5 +726,11 @@ assignNoEnum
         },
     }
 );
+
+STATIC_ENCODER._guardResolution =
+function (name)
+{
+    throw _Error('Unable to resolve ' + name + ' statically');
+};
 
 initStaticEncoder(STATIC_ENCODER);

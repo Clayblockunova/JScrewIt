@@ -9,10 +9,10 @@ import
     CHARACTERS,
     COMPLEX,
     CONSTANTS,
+    FORMAT_MAPPER_LONG,
+    FORMAT_MAPPER_SHORT,
     FROM_CHAR_CODE,
     FROM_CHAR_CODE_CALLBACK_FORMATTER,
-    MAPPER_FORMATTER,
-    OPTIMAL_ARG_NAME,
     OPTIMAL_B,
     OPTIMAL_RETURN_STRING,
 }
@@ -108,7 +108,7 @@ if (typeof NO_DEBUG === 'undefined')
         {
             constant = _String(constant);
             if (!/^[$A-Z_a-z][$\w]*$/.test(constant))
-                throw new _SyntaxError('Invalid identifier ' + _JSON_stringify(constant));
+                throw _SyntaxError('Invalid identifier ' + _JSON_stringify(constant));
             if (!encoder.hasOwnProperty('constantDefinitions'))
                 encoder.constantDefinitions = _Object_create(CONSTANTS);
             var entries = [define(esToString(definition))];
@@ -184,10 +184,10 @@ if (typeof NO_DEBUG === 'undefined')
                 ENTRIES[name + ':available'] = entries.available;
             }
 
+            exposeEntries('FORMAT_MAPPER_LONG',               FORMAT_MAPPER_LONG);
+            exposeEntries('FORMAT_MAPPER_SHORT',              FORMAT_MAPPER_SHORT);
             exposeEntries('FROM_CHAR_CODE',                     FROM_CHAR_CODE);
             exposeEntries('FROM_CHAR_CODE_CALLBACK_FORMATTER',  FROM_CHAR_CODE_CALLBACK_FORMATTER);
-            exposeEntries('MAPPER_FORMATTER',                   MAPPER_FORMATTER);
-            exposeEntries('OPTIMAL_ARG_NAME',                   OPTIMAL_ARG_NAME);
             exposeEntries('OPTIMAL_B',                          OPTIMAL_B);
             exposeEntries('OPTIMAL_RETURN_STRING',              OPTIMAL_RETURN_STRING);
         }

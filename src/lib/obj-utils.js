@@ -60,7 +60,7 @@ export var createEmpty = _Object_create.bind(null, null, undefined);
 export function esToString(arg)
 {
     if (typeof arg === 'symbol')
-        throw new _TypeError('Cannot convert a symbol to a string');
+        throw _TypeError('Cannot convert a symbol to a string');
     var str = _String(arg);
     return str;
 }

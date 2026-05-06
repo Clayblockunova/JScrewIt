@@ -28,10 +28,10 @@ export var R_PADDINGS =
 
 export var SIMPLE = createEmpty();
 
+export var FORMAT_MAPPER_LONG;
+export var FORMAT_MAPPER_SHORT;
 export var FROM_CHAR_CODE;
 export var FROM_CHAR_CODE_CALLBACK_FORMATTER;
-export var MAPPER_FORMATTER;
-export var OPTIMAL_ARG_NAME;
 export var OPTIMAL_B;
 export var OPTIMAL_RETURN_STRING;
 
@@ -52,12 +52,6 @@ var FH_PADDING_ENTRIES_MAP = createEmpty();
 
 var FB_R_PADDING_SHIFTS;
 var FH_R_PADDING_SHIFTS;
-
-function chooseOtherArgName(argName)
-{
-    var otherArgName = argName !== 'undefined' ? 'undefined' : 'falsefalse';
-    return otherArgName;
-}
 
 function createCharDefinitionInFn(expr, index, paddingEntries)
 {
@@ -710,7 +704,7 @@ function getFHPaddingEntries(index)
         ',':
         [
             define('(RP_0_S + F_A_L_S_E)[1]'),
-            define({ expr: '[[]].concat([[]])', solutionType: SolutionType.OBJECT }),
+            define({ expr: '[[]][CONCAT]([[]])', solutionType: SolutionType.OBJECT }),
         ],
         '-': '(.0000001 + [])[2]',
         '.': '(11e20 + [])[1]',
@@ -780,6 +774,7 @@ function getFHPaddingEntries(index)
         'E':
         [
             define('btoa("0NaN")[1]'),
+            define('escape(RP_4_A + "".italics())[10]'),
             define('(RP_5_A + "".link())[10]', CAPITAL_HTML),
         ],
         'F':
@@ -1092,7 +1087,7 @@ function getFHPaddingEntries(index)
         RegExp:         define({ expr: 'RegExp.name', optimize: { complexOpt: false } }, NAME),
         String:         define('String.name', NAME),
         fromCharCo:
-        define({ expr: '"from3har3o".split(3).join("C")', optimize: { complexOpt: false } }),
+        define({ expr: '"from3har3o"[SPLIT](3)[JOIN]("C")', optimize: { complexOpt: false } }),
         mCh:            define('atob("bUNo")'),
     }); // eslint-disable-line @origin-1/bracket-layout
 
@@ -1182,10 +1177,11 @@ function getFHPaddingEntries(index)
         [
             define('[].at', AT),
         ],
-        FILTER:
+        CONCAT:
         [
-            define('[].filter'),
+            define({ expr: '"concat"', solutionType: SolutionType.COMBINED_STRING }),
         ],
+        FILTER:     '[].filter',
         FLAT:
         [
             define('[].flat', FLAT),
@@ -1194,10 +1190,18 @@ function getFHPaddingEntries(index)
         [
             define('[][SLICE_OR_FLAT].call("false")'),
         ],
+        JOIN:
+        [
+            define({ expr: '"join"', solutionType: SolutionType.COMBINED_STRING }),
+        ],
         LOCALE_AR:
         [
             define({ expr: '"ar-td"', solutionType: SolutionType.COMBINED_STRING }),
             define({ expr: '"ar"', solutionType: SolutionType.COMBINED_STRING }, SHORT_LOCALES),
+        ],
+        MAP:
+        [
+            define({ expr: '"map"', optimize: true, solutionType: SolutionType.COMBINED_STRING }),
         ],
         PLAIN_OBJECT:
         [
@@ -1216,6 +1220,10 @@ function getFHPaddingEntries(index)
         [
             define({ expr: '"slice"', solutionType: SolutionType.COMBINED_STRING }),
             define({ expr: '"substr"', solutionType: SolutionType.COMBINED_STRING }),
+        ],
+        SPLIT:
+        [
+            define({ expr: '"split"', optimize: true, solutionType: SolutionType.COMBINED_STRING }),
         ],
         TO_LOCALE_STRING:
         [
@@ -1442,6 +1450,108 @@ function getFHPaddingEntries(index)
 
     FH_R_PADDING_SHIFTS = [define(1, IE_SRC), define(0, NO_IE_SRC)];
 
+    FORMAT_MAPPER_LONG =
+    defineList
+    (
+        [
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(falsefalse){return function(undefined){return ' +
+                        'falsefalse' + accessor + '}}")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'undefined';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(f){return this' + accessor + '}")().bind';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'f';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return falsefalse=>undefined=>falsefalse' + accessor + '")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'undefined';
+                    return formatMapper;
+                })(),
+                ARROW
+            ),
+        ],
+        [
+            define(0),
+            define(1, ARRAY_ITERATOR),
+            define(0, NO_FF_SRC),
+            define(0, NO_V8_SRC),
+            define(1, ARRAY_ITERATOR, CAPITAL_HTML),
+            define(0, ARRAY_ITERATOR, AT),
+            define(0, ARRAY_ITERATOR, FLAT),
+            define(0, ARRAY_ITERATOR, NO_IE_SRC),
+            define(0, ARRAY_ITERATOR, CAPITAL_HTML, IE_SRC),
+            define(2),
+        ]
+    );
+
+    FORMAT_MAPPER_SHORT =
+    defineList
+    (
+        [
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return function(undefined){return function(falsefalse){return ' +
+                        'undefined[1][undefined[0]' + accessor + ']}}")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'falsefalse';
+                    return formatMapper;
+                })()
+            ),
+            define
+            (
+                (function () {
+                    var formatMapper =
+                    function (accessor)
+                    {
+                        var mapper =
+                        'Function("return undefined=>falsefalse=>undefined[1][undefined[0]' +
+                        accessor + ']")()';
+                        return mapper;
+                    };
+                    formatMapper.argName = 'falsefalse';
+                    return formatMapper;
+                })(),
+                ARROW
+            ),
+        ],
+        [define(0), define(1)]
+    );
+
     FROM_CHAR_CODE =
     defineList
     (
@@ -1565,67 +1675,12 @@ function getFHPaddingEntries(index)
         ]
     );
 
-    MAPPER_FORMATTER =
-    defineList
-    (
-        [
-            define
-            (
-                function (argName, accessor)
-                {
-                    var otherArgName = chooseOtherArgName(argName);
-                    var mapper =
-                    'Function("return function(' + otherArgName + '){return function(' + argName +
-                    '){return ' + otherArgName + accessor + '}}")()';
-                    return mapper;
-                }
-            ),
-            define
-            (
-                function (argName, accessor)
-                {
-                    var mapper =
-                    'Function("return function(' + argName + '){return this' + accessor +
-                    '}")().bind';
-                    return mapper;
-                }
-            ),
-            define
-            (
-                function (argName, accessor)
-                {
-                    var otherArgName = chooseOtherArgName(argName);
-                    var mapper =
-                    'Function("return ' + otherArgName + '=>' + argName + '=>' + otherArgName +
-                    accessor + '")()';
-                    return mapper;
-                },
-                ARROW
-            ),
-        ],
-        [
-            define(0),
-            define(1, ARRAY_ITERATOR),
-            define(0, NO_FF_SRC),
-            define(0, NO_V8_SRC),
-            define(1, ARRAY_ITERATOR, CAPITAL_HTML),
-            define(0, ARRAY_ITERATOR, AT),
-            define(0, ARRAY_ITERATOR, FLAT),
-            define(0, ARRAY_ITERATOR, NO_IE_SRC),
-            define(0, ARRAY_ITERATOR, CAPITAL_HTML, IE_SRC),
-            define(2),
-        ]
-    );
-
     NATIVE_FUNCTION_INFOS =
     [
         define({ expr: 'FILTER', shift: 6 }),
         define({ expr: 'FLAT', shift: 4 }, FLAT),
         define({ expr: 'AT', shift: 2 }, AT),
     ];
-
-    OPTIMAL_ARG_NAME =
-    defineList([define('f'), define('undefined')], [define(0), define(1, AT), define(0, FLAT)]);
 
     OPTIMAL_B = defineList([define('B'), define('b')], [define(0), define(1, ARRAY_ITERATOR)]);
 

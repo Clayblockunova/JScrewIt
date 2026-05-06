@@ -9,17 +9,18 @@ from '../append-lengths';
 import
 {
     AMENDINGS,
+    FORMAT_MAPPER_LONG,
+    FORMAT_MAPPER_SHORT,
     FROM_CHAR_CODE,
     FROM_CHAR_CODE_CALLBACK_FORMATTER,
-    MAPPER_FORMATTER,
-    OPTIMAL_ARG_NAME,
     OPTIMAL_RETURN_STRING,
     SIMPLE,
 }
 from '../definitions';
-import expressParse                                                 from '../express-parse';
-import { Feature }                                                  from '../features';
-import createFigurator                                              from '../figurator';
+import expressParse                         from '../express-parse';
+import { Feature }                          from '../features';
+import createFigurator                      from '../figurator';
+import joinWithMaxLength                    from '../join-with-max-length';
 import
 {
     _Array_prototype_forEach_call,
@@ -36,9 +37,10 @@ import
     tryCreateRegExp,
 }
 from '../obj-utils';
-import { SCREW_AS_BONDED_STRING, SCREW_AS_STRING, SCREW_NORMAL }    from '../screw-buffer';
-import { Encoder }                                                  from './encoder-base';
-import { codePointFromSurrogatePair, replaceStaticString }          from './encoder-utils';
+import { SCREW_AS_STRING, SCREW_NORMAL }    from '../screw-buffer';
+import { Encoder }                          from './encoder-base';
+import { codePointFromSurrogatePair }       from './encoder-utils';
+import replaceStringArray                   from './replace-string-array';
 
 var ENCODING_TYPE_COMBINED      = 'combined';
 var ENCODING_TYPE_EXPRESSION    = 'expression';
@@ -46,6 +48,12 @@ var ENCODING_TYPE_TEXT          = 'text';
 
 var FALSE_FREE_DELIMITER = { joiner: 'false', separator: 'false' };
 var FALSE_TRUE_DELIMITER = { joiner: '', separator: 'Function("return/(?=false|true)/")()' };
+
+// Underestimated minimum length of the joining: "[" + joinReplacement + "]([])".
+var JOINING_MIN_LENGTH      = 8;
+
+// Underestimated minimum overhead of the mapping: "[" + "](" + mapperReplacement + ")".
+var MAPPING_MIN_OVERHEAD    = 12;
 
 var REPLACERS =
 {
@@ -144,23 +152,62 @@ function createCharKeyArrayString
     return charKeyArrayStr;
 }
 
-function createJSFuckArrayMapping(encoder, arrayStr, mapper, legend)
+function createLongStrCodesOutput(encoder, arrayReplacement, fromCharCode, arg, maxLength)
 {
-    var result =
-    arrayStr + '[' + encoder.replaceString('map', { optimize: true }) + '](' +
-    encoder.replaceExpr(mapper, true) + '(' + legend + '))';
-    return result;
-}
-
-function createLongStrCodesOutput(encoder, strCodeArrayStr, fromCharCode, arg)
-{
+    var mapReplacement = encoder.resolveConstant('MAP').replacement;
+    var maxCharArrayLength = maxLength - JOINING_MIN_LENGTH;
+    var maxMapReplacementLength =
+    maxCharArrayLength - arrayReplacement.length - MAPPING_MIN_OVERHEAD;
+    if (mapReplacement.length > maxMapReplacementLength)
+        return;
     var formatter = encoder.findDefinition(FROM_CHAR_CODE_CALLBACK_FORMATTER);
     var formatterExpr = formatter(fromCharCode, arg);
-    var output =
-    strCodeArrayStr + '[' + encoder.replaceString('map', { optimize: true }) + '](' +
-    encoder.replaceExpr('Function("return ' + formatterExpr + '")()', true) + ')[' +
-    encoder.replaceString('join') + ']([])';
-    return output;
+    var mapper = 'Function("return ' + formatterExpr + '")()';
+    var mapperReplacement = encoder._replaceMapper(mapper);
+    var charArrayReplacement =
+    joinWithMaxLength
+    (
+        maxCharArrayLength,
+        arrayReplacement,
+        '[',
+        mapReplacement,
+        '](',
+        mapperReplacement,
+        ')'
+    );
+    if (!charArrayReplacement)
+        return;
+    var replacement = encoder._joinCharArray(charArrayReplacement, maxLength);
+    return replacement;
+}
+
+function createMappedArrayEncoding(encoder, arrayReplacement, mapper, legend, maxLength)
+{
+    var mapReplacement = encoder.resolveConstant('MAP').replacement;
+    var maxCharArrayLength = maxLength - JOINING_MIN_LENGTH;
+    var maxMapReplacementLength =
+    // 2 is for the calling parentheses around the legend replacement.
+    maxCharArrayLength - arrayReplacement.length - MAPPING_MIN_OVERHEAD - legend.length - 2;
+    if (mapReplacement.length > maxMapReplacementLength)
+        return;
+    var mapperReplacement = encoder._replaceMapper(mapper);
+    var charArrayReplacement =
+    joinWithMaxLength
+    (
+        maxCharArrayLength,
+        arrayReplacement,
+        '[',
+        mapReplacement,
+        '](',
+        mapperReplacement,
+        '(',
+        legend,
+        '))'
+    );
+    if (!charArrayReplacement)
+        return;
+    var replacement = encoder._joinCharArray(charArrayReplacement, maxLength);
+    return replacement;
 }
 
 export function createReindexMap(count, radix, amendingCount, coerceToInt)
@@ -228,41 +275,58 @@ function createStrCodesEncoding(encoder, inputData, fromCharCode, splitter, radi
     var strCodeCacheKey = 'strCodeCache' + (radix ? 'Radix' + radix : '');
     var cache = inputData[strCodeCacheKey] || (inputData[strCodeCacheKey] = createEmpty());
     var strCodeArray = splitter(input, radix, cache);
-    var strCodeArrayStr = encoder.replaceFalseFreeArray(strCodeArray, maxLength);
+    var strCodeArrayStr =
+    encoder.replaceStringArray(strCodeArray, [FALSE_FREE_DELIMITER], null, false, false, maxLength);
     if (strCodeArrayStr)
     {
-        var output;
+        var replacement;
         if (radix)
         {
-            output =
+            replacement =
             createLongStrCodesOutput
-            (encoder, strCodeArrayStr, fromCharCode, 'parseInt(undefined,' + radix + ')');
+            (
+                encoder,
+                strCodeArrayStr,
+                fromCharCode,
+                'parseInt(undefined,' + radix + ')',
+                maxLength
+            );
         }
         else
         {
             var long = strCodeArray.length > encoder._maxDecodableArgs;
             if (long)
             {
-                output =
-                createLongStrCodesOutput(encoder, strCodeArrayStr, fromCharCode, 'undefined');
+                replacement =
+                createLongStrCodesOutput
+                (
+                    encoder,
+                    strCodeArrayStr,
+                    fromCharCode,
+                    'undefined',
+                    maxLength
+                );
             }
             else
             {
                 var returnString = encoder.findDefinition(OPTIMAL_RETURN_STRING);
                 var str = returnString + '.' + fromCharCode + '(';
-                output =
-                encoder.resolveConstant('Function').replacement +
-                '(' +
-                encoder.replaceString(str, { optimize: true }) +
-                '+' +
-                strCodeArrayStr +
-                '+' +
-                encoder.resolveCharacter(')').replacement +
-                ')()';
+                replacement =
+                joinWithMaxLength
+                (
+                    maxLength,
+                    encoder.resolveConstant('Function').replacement,
+                    '(',
+                    encoder.replaceString(str, { optimize: true }),
+                    '+',
+                    strCodeArrayStr,
+                    '+',
+                    encoder.resolveCharacter(')').replacement,
+                    ')()'
+                );
             }
         }
-        if (!(output.length > maxLength))
-            return output;
+        return replacement;
     }
 }
 
@@ -321,8 +385,7 @@ function encodeByDblDict
     var legend = encodeDictLegend(encoder, dictChars, maxLength - minCharIndexArrayStrLength);
     if (!legend)
         return;
-    var figureLegendInsertions =
-    encoder._callGetFigureLegendInsertions(getFigureLegendInsertions, figurator, figures);
+    var figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
     var figureMaxLength = maxLength - legend.length;
     var figureLegend =
     encoder.replaceStringArray
@@ -336,7 +399,7 @@ function encodeByDblDict
     );
     if (!figureLegend)
         return;
-    var charFigureArrayStr =
+    var charIndexFigureArrayStr =
     createCharKeyArrayString
     (
         encoder,
@@ -347,15 +410,12 @@ function encodeByDblDict
         true,
         figureMaxLength - figureLegend.length
     );
-    if (!charFigureArrayStr)
+    if (!charIndexFigureArrayStr)
         return;
-    var formatter = encoder.findDefinition(MAPPER_FORMATTER);
-    var argName = 'undefined';
-    var accessor = '.indexOf(' + argName + ')';
-    var mapper = formatter(argName, accessor);
-    var charIndexArrayStr =
-    createJSFuckArrayMapping(encoder, charFigureArrayStr, mapper, figureLegend);
-    var output = encoder.createDictEncoding(legend, charIndexArrayStr, maxLength);
+    var formatMapper = encoder._findFormatMapperShort();
+    var output =
+    encoder._createDblDictEncoding
+    (formatMapper, charIndexFigureArrayStr, figureLegend, legend, maxLength);
     return output;
 }
 
@@ -489,13 +549,6 @@ function splitIntoCodePoints(str, radix, cache)
         strCodes.push(strCode);
     }
     return strCodes;
-}
-
-function undefinedAsString(replacement)
-{
-    if (replacement === '[][[]]')
-        replacement += '+[]';
-    return replacement;
 }
 
 export function wrapWithCall(str)
@@ -870,7 +923,7 @@ var falseTrueFigurator = createFigurator(['false', 'true'], '');
                 return output;
             },
             ENCODING_TYPE_TEXT,
-            193
+            194
         ),
 
         /* -------------------------------------------------------------------------------------- *\
@@ -925,7 +978,7 @@ var falseTrueFigurator = createFigurator(['false', 'true'], '');
                 return output;
             },
             ENCODING_TYPE_TEXT,
-            347
+            173
         ),
 
         /* -------------------------------------------------------------------------------------- *\
@@ -1015,11 +1068,51 @@ assignNoEnum
 (
     Encoder.prototype,
     {
-        _callGetFigureLegendInsertions:
-        function (getFigureLegendInsertions, figurator, figures)
+        _createDblDictEncoding:
+        function (formatMapper, charIndexFigureArrayStr, figureLegend, legend, maxLength)
         {
-            var figureLegendInsertions = getFigureLegendInsertions(figurator, figures);
-            return figureLegendInsertions;
+            var argName = formatMapper.argName;
+            var accessor = '.indexOf(' + argName + ')';
+            var mapper = formatMapper(accessor);
+            var concatReplacement = this.resolveConstant('CONCAT').replacement;
+            var maxCombinedLegendLength = maxLength - charIndexFigureArrayStr.length - 10;
+            var combinedLegend =
+            joinWithMaxLength
+            (
+                maxCombinedLegendLength,
+                '[',
+                figureLegend,
+                '][',
+                concatReplacement,
+                '](',
+                legend,
+                ')'
+            );
+            if (!combinedLegend)
+                return;
+            var replacement =
+            createMappedArrayEncoding
+            (this, charIndexFigureArrayStr, mapper, combinedLegend, maxLength);
+            return replacement;
+        },
+
+        _createDictEncoding:
+        function (charIndexArrayStr, legend, radix, coerceToInt, maxLength)
+        {
+            var mapper;
+            if (radix)
+            {
+                var formatMapper = this.findDefinition(FORMAT_MAPPER_LONG);
+                var argName = formatMapper.argName;
+                var parseIntArg = (coerceToInt ? '+' : '') + argName;
+                var accessor = '[parseInt(' + parseIntArg + ',' + radix + ')]';
+                mapper = formatMapper(accessor);
+            }
+            else
+                mapper = '"".charAt.bind';
+            var replacement =
+            createMappedArrayEncoding(this, charIndexArrayStr, mapper, legend, maxLength);
+            return replacement;
         },
 
         _encodeByCharCodes:
@@ -1116,7 +1209,7 @@ assignNoEnum
             if (!charIndexArrayStr)
                 return;
             var output =
-            this.createDictEncoding(legend, charIndexArrayStr, maxLength, radix, coerceToInt);
+            this._createDictEncoding(charIndexArrayStr, legend, radix, coerceToInt, maxLength);
             return output;
         },
 
@@ -1164,270 +1257,36 @@ assignNoEnum
                 perfInfo.perfLog = perfLog;
             delete this.perfLog;
             if (output == null)
-                throw new _Error('Encoding failed');
+                throw _Error('Encoding failed');
             return output;
         },
 
-        _maxDecodableArgs: 65533, // Limit imposed by Internet Explorer.
-
-        createDictEncoding:
-        function (legend, charIndexArrayStr, maxLength, radix, coerceToInt)
+        _findFormatMapperShort:
+        function ()
         {
-            var mapper;
-            if (radix)
-            {
-                var formatter = this.findDefinition(MAPPER_FORMATTER);
-                var argName = this.findDefinition(OPTIMAL_ARG_NAME);
-                var parseIntArg = (coerceToInt ? '+' : '') + argName;
-                var accessor = '[parseInt(' + parseIntArg + ',' + radix + ')]';
-                mapper = formatter(argName, accessor);
-            }
-            else
-                mapper = '"".charAt.bind';
-            var output =
-            createJSFuckArrayMapping(this, charIndexArrayStr, mapper, legend) + '[' +
-            this.replaceString('join') + ']([])';
-            if (!(output.length > maxLength))
-                return output;
+            var formatMapper = this.findDefinition(FORMAT_MAPPER_SHORT);
+            return formatMapper;
         },
 
-        // Array elements may not contain the substring "false", because the value false could be
-        // used as a separator in the encoding.
-        replaceFalseFreeArray:
-        function (array, maxLength)
+        _joinCharArray:
+        function (charArrayReplacement, maxLength)
         {
-            var result =
-            this.replaceStringArray(array, [FALSE_FREE_DELIMITER], null, false, false, maxLength);
-            return result;
-        },
-
-        replaceJoinedArrayString:
-        function (str, maxLength)
-        {
-            var options = { maxLength: maxLength, screwMode: SCREW_AS_BONDED_STRING };
-            var replacement = replaceStaticString(str, options);
+            var joinReplacement = this.resolveConstant('JOIN').replacement;
+            var replacement =
+            joinWithMaxLength(maxLength, charArrayReplacement, '[', joinReplacement, ']([])');
             return replacement;
         },
 
-        /**
-         * An object that exposes properties used to split a string into an array of strings or to
-         * join array elements into a string.
-         *
-         * @typedef Delimiter
-         *
-         * @property {string} separator
-         * An express-parsable expression used as an argument for `String.prototype.split` to split
-         * a string into an array of strings.
-         *
-         * @property {string} joiner
-         * The joiner can be any string. A joiner is inserted between adjacent strings in an array
-         * in order to join them into a single string.
-         */
+        _maxDecodableArgs:  65533, // Limit imposed by Internet Explorer.
 
-        /**
-         * Replaces a given array of strings with equivalent JSFuck code.
-         *
-         * Array elements may only contain characters with static definitions in their string
-         * representations.
-         *
-         * @function Encoder#replaceStringArray
-         *
-         * @param {string[]} array
-         * The string array to replace. Empty arrays are not supported.
-         *
-         * @param {Delimiter[]} insertions
-         * An array of delimiters of which at most one will be used to compose a joined string and
-         * split it into an array of strings.
-         *
-         * The encoder can pick an insertion and insert a joiner between any two adjacent elements
-         * to mark the boundary between them. The separator is then used to split the concatenated
-         * string back into its elements.
-         *
-         * @param {Delimiter[]|null} [substitutions]
-         * An array of delimiters, specifying substitutions to be applied to the input elements.
-         *
-         * All substitutions are applied on each element of the input array, in the order they are
-         * specified.
-         *
-         * Substitutions are expensive in two ways: they create additional overhead and prevent
-         * certain optimizations for short arrays to be made. To allow all optimizations to be
-         * performed, omit this argument or set it to null instead of specifying an empty array.
-         *
-         * @param {boolean} [allowZeroForEmptyElements=false]
-         * Indicates whether empty string elements in the input array may be replaced with zeros.
-         *
-         * @param {boolean} [forceString=false]
-         * Indicates whether the elements in the replacement expression should evaluate to strings.
-         *
-         * If this argument is falsy, the elements in the replacement expression may not be equal to
-         * those in the input array, but will have the same string representation.
-         *
-         * Regardless of this argument, the string representation of the value of the whole
-         * replacement expression will be always the same as the string representation of the input
-         * array after applying substitutions (including optional empty string to zero replacements)
-         * to its elements.
-         *
-         * @param {number} [maxLength=(NaN)]
-         * The maximum length of the replacement expression.
-         *
-         * If the replacement expression exceeds the specified length, the return value is
-         * `undefined`.
-         *
-         * If this parameter is `NaN`, then no length limit is imposed.
-         *
-         * @returns {string|undefined}
-         * The replacement string or `undefined`.
-         */
-        replaceStringArray:
-        function
-        (array, insertions, substitutions, allowZeroForEmptyElements, forceString, maxLength)
+        _replaceMapper:
+        function (mapper)
         {
-            var replacement;
-            var count = array.length;
-            // Don't even try the split approach for two or less elements if the concat approach can
-            // be applied.
-            if (substitutions || count > 2)
-            {
-                var preReplacement =
-                function ()
-                {
-                    // Length of the shortest string replacement "([]+[])".
-                    var STRING_REPLACEMENT_MIN_LENGTH = 7;
-
-                    // This is for the overhead of "[" + "](" + ")" plus the length of the shortest
-                    // separator replacement "[]".
-                    var SEPARATOR_MIN_OVERHEAD = 6;
-
-                    // This is for the overhead of "[" + "](" + ")" plus the length of the shortest
-                    // joiner replacement "[]".
-                    var JOINER_MIN_OVERHEAD = 6;
-
-                    var joinCount = substitutions ? substitutions.length : 0;
-                    var splitCount = joinCount + 1;
-                    var maxSplitReplacementLength =
-                    (maxLength - STRING_REPLACEMENT_MIN_LENGTH) / splitCount -
-                    SEPARATOR_MIN_OVERHEAD;
-                    var splitReplacement =
-                    this.replaceString
-                    ('split', { maxLength: maxSplitReplacementLength, optimize: true });
-                    if (!splitReplacement)
-                        return;
-                    var preReplacement = '';
-                    if (joinCount)
-                    {
-                        var maxJoinReplacementLength =
-                        (
-                            maxLength - STRING_REPLACEMENT_MIN_LENGTH -
-                            splitCount * (splitReplacement.length + SEPARATOR_MIN_OVERHEAD)
-                        ) /
-                        joinCount -
-                        JOINER_MIN_OVERHEAD;
-                        var joinReplacement =
-                        this.replaceString('join', { maxLength: maxJoinReplacementLength });
-                        if (!joinReplacement)
-                            return;
-                        substitutions.forEach
-                        (
-                            function (substitution)
-                            {
-                                var separatorReplacement =
-                                undefinedAsString(this.replaceExpr(substitution.separator));
-                                var joinerReplacement =
-                                undefinedAsString(this.replaceString(substitution.joiner));
-                                preReplacement +=
-                                '[' + splitReplacement + '](' + separatorReplacement + ')[' +
-                                joinReplacement + '](' + joinerReplacement + ')';
-                            },
-                            this
-                        );
-                    }
-                    preReplacement += '[' + splitReplacement + ']';
-                    return preReplacement;
-                }
-                .call(this);
-            }
-            if (!substitutions && count > 1)
-            {
-                var concatReplacement =
-                this.replaceString('concat', { maxLength: maxLength, optimize: true });
-            }
-            if (preReplacement)
-            // Approach 1: (array[0] + joiner + array[1] + joiner + array[2]...).split(separator)
-            {
-                // 2 is for the additional overhead of "(" + ")".
-                var maxBulkLength = maxLength - (preReplacement.length + 2);
-                var optimalStrReplacement;
-                var optimalSeparatorReplacement;
-                insertions.forEach
-                (
-                    function (insertion)
-                    {
-                        var str = array.join(insertion.joiner);
-                        var strReplacement = this.replaceJoinedArrayString(str, maxBulkLength);
-                        if (!strReplacement)
-                            return;
-                        var separatorReplacement =
-                        undefinedAsString(this.replaceExpr(insertion.separator));
-                        var bulkLength = strReplacement.length + separatorReplacement.length;
-                        if (!(bulkLength > maxBulkLength))
-                        {
-                            maxBulkLength = bulkLength;
-                            optimalStrReplacement = strReplacement;
-                            optimalSeparatorReplacement = separatorReplacement;
-                        }
-                    },
-                    this
-                );
-                if (optimalStrReplacement)
-                {
-                    replacement =
-                    optimalStrReplacement + preReplacement + '(' + optimalSeparatorReplacement +
-                    ')';
-                    maxLength = replacement.length - 1;
-                }
-            }
-            if
-            (
-                !substitutions &&
-                (
-                    count <= 1 ||
-                    concatReplacement &&
-                    // 4 is the length of the shortest possible replacement "[[]]".
-                    // 7 is the length of the shortest possible additional overhead for each
-                    // following array element, as in "[" + "](+[])" or "[" + "](![])".
-                    !(4 + (concatReplacement.length + 7) * (count - 1) > maxLength)
-                )
-            )
-            // Approach 2: [array[0]].concat(array[1]).concat(array[2])...
-            {
-                var arrayReplacement;
-                var options = { screwMode: forceString ? SCREW_AS_STRING : SCREW_NORMAL };
-                if
-                (
-                    !array.some
-                    (
-                        function (element)
-                        {
-                            var elementReplacement =
-                            undefinedAsString(replaceStaticString(element, options));
-                            if (arrayReplacement)
-                            {
-                                if (elementReplacement === '[]')
-                                    elementReplacement = allowZeroForEmptyElements ? '+[]' : '[[]]';
-                                arrayReplacement +=
-                                '[' + concatReplacement + '](' + elementReplacement + ')';
-                            }
-                            else
-                                arrayReplacement = '[' + elementReplacement + ']';
-                            var result = arrayReplacement.length > maxLength;
-                            return result;
-                        }
-                    )
-                )
-                    replacement = arrayReplacement;
-            }
-            return replacement;
+            var mapperReplacement = this.replaceExpr(mapper, true);
+            return mapperReplacement;
         },
+
+        replaceStringArray: replaceStringArray,
     }
 );
 

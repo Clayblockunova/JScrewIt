@@ -79,7 +79,9 @@
             (
                 function (featureName)
                 {
-                    EMU_FEATURE_INFOS[featureName].call(context);
+                    var emuFeatureInfo = EMU_FEATURE_INFOS[featureName];
+                    if (emuFeatureInfo)
+                        emuFeatureInfo.call(context);
                 }
             );
             var result = callback();
@@ -978,16 +980,7 @@
         WINDOW:                 makeEmuFeatureSelf('[object Window]', /^\[object Window]$/),
     };
 
-    var EMU_FEATURES =
-    Object.keys(EMU_FEATURE_INFOS).filter
-    (
-        function (featureName)
-        {
-            var condition = EMU_FEATURE_INFOS[featureName].condition;
-            var result = !condition || condition();
-            return result;
-        }
-    );
+    var EMU_FEATURES = Object.keys(EMU_FEATURE_INFOS);
 
     var isArrayToStringGeneric;
     try

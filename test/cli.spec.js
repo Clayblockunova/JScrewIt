@@ -2,50 +2,51 @@
 
 'use strict';
 
-var cli     = require('../tools/cli');
-var assert  = require('assert');
+const cli       = require('../tools/cli');
+const assert    = require('node:assert/strict');
+
+function doAssert(actual, expected)
+{
+    if (expected instanceof RegExp)
+        assert.match(actual, expected);
+    else
+        assert.strictEqual(actual, expected);
+}
 
 describe
 (
     'screw.js',
-    function ()
+    () =>
     {
-        var childProcessExports = require('child_process');
-        var fs                  = require('fs');
-        var os                  = require('os');
-        var path                = require('path');
+        const childProcessExports   = require('node:child_process');
+        const fs                    = require('node:fs');
+        const os                    = require('node:os');
+        const path                  = require('node:path');
 
         function createOutputFileName()
         {
-            var tmpDir = os.tmpdir();
+            let outputFileName;
+            const tmpDir = os.tmpdir();
             do
             {
-                var fileName = '';
+                let fileName = '';
                 do
                     fileName += (Math.random() * 36 | 0).toString(36);
                 while (fileName.length < 10);
-                var outputFileName = path.join(tmpDir, fileName);
+                outputFileName = path.join(tmpDir, fileName);
             }
             while (fs.existsSync(outputFileName));
             return outputFileName;
         }
 
-        function doAssert(actual, expected)
-        {
-            if (expected instanceof RegExp)
-                assert(expected.test(actual), 'expected "' + actual + '" to match ' + expected);
-            else
-                assert.strictEqual(actual, expected);
-        }
-
-        var options = { cwd: path.dirname(__dirname) };
-        var outputFileName1 = createOutputFileName();
-        var expectedFiles1 = { };
+        const options = { cwd: path.dirname(__dirname) };
+        const outputFileName1 = createOutputFileName();
+        const expectedFiles1 = { };
         expectedFiles1[outputFileName1] = '+[]';
-        var outputFileName2 = createOutputFileName();
-        var expectedFiles2 = { };
+        const outputFileName2 = createOutputFileName();
+        const expectedFiles2 = { };
         expectedFiles2[outputFileName2] = '+[]';
-        var paramDataList =
+        const paramDataList =
         [
             {
                 description:            'shows the help message with option "--help"',
@@ -66,7 +67,9 @@ describe
                 screwArgs:              ['--foo'],
                 expectedStdout:         '',
                 expectedStderr:
-                'screw.js: unrecognized option "--foo".\n' +
+                'screw.js: Unknown option \'--foo\'. To specify a positional argument starting ' +
+                'with a \'-\', place it at the end of the command after \'--\', as in \'-- ' +
+                '"--foo".\n' +
                 'Try "screw.js --help" for more information.\n',
                 expectedExitCode:       1,
             },
@@ -88,8 +91,7 @@ describe
             {
                 description:            'prints the encoded input interactively',
                 screwArgs:              [],
-                childProcessHandler:
-                function (childProcess)
+                childProcessHandler(childProcess)
                 {
                     childProcess.stdin.write('10\n');
                     childProcess.stdin.end();
@@ -101,8 +103,7 @@ describe
             {
                 description:            'prints an error message interactively',
                 screwArgs:              ['-x'],
-                childProcessHandler:
-                function (childProcess)
+                childProcessHandler(childProcess)
                 {
                     childProcess.stdin.write('?\n');
                     childProcess.stdin.end();
@@ -114,8 +115,7 @@ describe
             {
                 description:            'ignores empty input interactively',
                 screwArgs:              [],
-                childProcessHandler:
-                function (childProcess)
+                childProcessHandler(childProcess)
                 {
                     childProcess.stdin.write('\n');
                     childProcess.stdin.end();
@@ -152,7 +152,7 @@ describe
                     'Screwed size: +\\d+ bytes\n' +
                     'Expansion factor: .*\n' +
                     'Encoding time: .*\n' +
-                    '$'
+                    '$',
                 ),
                 expectedStderr:         '',
                 expectedFiles:          expectedFiles2,
@@ -169,7 +169,7 @@ describe
                     'Screwed size: +\\d+ bytes\n' +
                     'Expansion factor: .*\n' +
                     'Encoding time: .*\n' +
-                    '$'
+                    '$',
                 ),
                 expectedStderr:         '',
                 expectedExitCode:       0,
@@ -179,47 +179,32 @@ describe
         it.per(paramDataList)
         (
             '#.description',
-            function (paramData, done)
+            (paramData, done) =>
             {
-                var screwArgs           = paramData.screwArgs;
-                var childProcessHandler = paramData.childProcessHandler;
-                var expectedStdout      = paramData.expectedStdout;
-                var expectedStderr      = paramData.expectedStderr;
-                var expectedFiles       = paramData.expectedFiles;
-                var expectedExitCode    = paramData.expectedExitCode;
-                var actualExitCode;
-                var args = ['./screw.js'].concat(screwArgs);
-                var childProcess =
+                const { screwArgs } = paramData;
+                const { childProcessHandler } = paramData;
+                const { expectedStdout } = paramData;
+                const { expectedStderr } = paramData;
+                const { expectedFiles } = paramData;
+                const { expectedExitCode } = paramData;
+                let actualExitCode;
+                const args = ['./screw.js'].concat(screwArgs);
+                const childProcess =
                 childProcessExports.execFile
                 (
                     process.execPath,
                     args,
                     options,
-                    function (error, stdout, stderr)
+                    (error, stdout, stderr) =>
                     {
-                        stderr =
-                        stderr.replace
-                        (
-                            RegExp
-                            (
-                                '^(' +
-                                'Debugger listening on .*\n' +
-                                'For help, see: https://nodejs\\.org/en/docs/inspector\n|' +
-                                'Debugger attached\\.\n|' +
-                                'Waiting for the debugger to disconnect\\.\\.\\.\n' +
-                                ')',
-                                'gm'
-                            ),
-                            ''
-                        );
                         try
                         {
                             doAssert(stdout, expectedStdout);
                             doAssert(stderr, expectedStderr);
-                            for (var filePath in expectedFiles)
+                            for (const filePath in expectedFiles)
                             {
-                                var actualContent = fs.readFileSync(filePath).toString();
-                                var expectedContent = expectedFiles[filePath];
+                                const actualContent = fs.readFileSync(filePath).toString();
+                                const expectedContent = expectedFiles[filePath];
                                 assert.strictEqual(actualContent, expectedContent);
                             }
                             assert.strictEqual(actualExitCode, expectedExitCode);
@@ -230,33 +215,33 @@ describe
                             return;
                         }
                         done();
-                    }
+                    },
                 )
                 .on
                 (
                     'exit',
-                    function (exitCode)
+                    exitCode =>
                     {
                         actualExitCode = exitCode;
-                    }
+                    },
                 );
                 if (childProcessHandler)
                     childProcessHandler(childProcess);
-            }
+            },
         )
         .timeout(5000);
-    }
+    },
 );
 
 describe
 (
     'parseCommandLine returns expected results with params',
-    function ()
+    () =>
     {
         function test(params, expectedResult)
         {
-            var argv = [null, '../screw.js'].concat(params);
-            var actualResult = cli.parseCommandLine(argv);
+            const argv = [null, '../screw.js'].concat(params);
+            const actualResult = cli.parseCommandLine(argv);
             assert.deepEqual(actualResult, expectedResult);
         }
 
@@ -269,34 +254,25 @@ describe
                 !(expectedErrorMsg instanceof RegExp)
             )
                 throw Error('Invalid value for argument expectedErrorMsg');
-            var argv = [null, '../screw.js'].concat(params);
+            const argv = [null, '../screw.js'].concat(params);
             try
             {
                 cli.parseCommandLine(argv);
             }
             catch (error)
             {
-                assert.strictEqual(Object.getPrototypeOf(error), Error.prototype);
+                assert(error instanceof Error);
                 if (expectedErrorMsg !== undefined)
                 {
-                    var actualErrorMsg = error.message;
-                    if (expectedErrorMsg instanceof RegExp)
-                    {
-                        assert
-                        (
-                            expectedErrorMsg.test(actualErrorMsg),
-                            'Expecting error message to match ' + expectedErrorMsg
-                        );
-                    }
-                    else
-                        assert.strictEqual(actualErrorMsg, expectedErrorMsg);
+                    const actualErrorMsg = error.message;
+                    doAssert(actualErrorMsg, expectedErrorMsg);
                 }
                 return;
             }
             assert.fail('Error expected');
         }
 
-        var paramDataList =
+        const paramDataList =
         [
             {
                 params: [],
@@ -380,11 +356,11 @@ describe
             },
             {
                 params:             ['-f'],
-                expectedErrorMsg:   'option "-f" requires an argument',
+                expectedErrorMsg:   'Option \'-f, --features <value>\' argument missing',
             },
             {
                 params:             ['--features'],
-                expectedErrorMsg:   'option "--features" requires an argument',
+                expectedErrorMsg:   'Option \'-f, --features <value>\' argument missing',
             },
             {
                 params: ['-r', 'express'],
@@ -406,11 +382,11 @@ describe
             },
             {
                 params:             ['-r'],
-                expectedErrorMsg:   'option "-r" requires an argument',
+                expectedErrorMsg:   'Option \'-r, --run-as <value>\' argument missing',
             },
             {
                 params:             ['--run-as'],
-                expectedErrorMsg:   'option "--run-as" requires an argument',
+                expectedErrorMsg:   'Option \'-r, --run-as <value>\' argument missing',
             },
             {
                 params: ['-t'],
@@ -450,11 +426,11 @@ describe
             },
             {
                 params:             ['-y'],
-                expectedErrorMsg:   /unrecognized flag "y"/,
+                expectedErrorMsg:   /^Unknown option '-y'/,
             },
             {
                 params:             ['--allyourbasearebelongtous'],
-                expectedErrorMsg:   /unrecognized option "--allyourbasearebelongtous"/,
+                expectedErrorMsg:   /^Unknown option '--allyourbasearebelongtous'/,
             },
             {
                 params: ['infile'],
@@ -485,110 +461,106 @@ describe
             },
             {
                 params:             ['infile', 'outfile', 'etc.'],
-                expectedErrorMsg:   /unexpected argument "etc."/,
+                expectedErrorMsg:   /^Unexpected argument "etc."/,
             },
         ];
-        paramDataList.forEach
-        (
-            function (paramData)
-            {
-                paramData.description = '"' + paramData.params.join(' ') + '"';
-            }
-        );
 
-        it.per(paramDataList)
+        it.per
+        (
+            paramDataList,
+            paramData => ({ description: `"${paramData.params.join(' ')}"`, ...paramData }),
+        )
         (
             '#.description',
-            function (paramData)
+            paramData =>
             {
-                var params = paramData.params;
+                const { params } = paramData;
                 if ('expectedResult' in paramData)
                 {
-                    var expectedResult = paramData.expectedResult;
+                    const { expectedResult } = paramData;
                     test(params, expectedResult);
                 }
                 else
                 {
-                    var expectedErrorMsg = paramData.expectedErrorMsg;
+                    const { expectedErrorMsg } = paramData;
                     testError(params, expectedErrorMsg);
                 }
-            }
+            },
         );
-    }
+    },
 );
 
 describe
 (
     'createReport',
-    function ()
+    () =>
     {
         it
         (
             'when screwed size is larger than original size',
-            function ()
+            () =>
             {
-                var actual = cli.createReport(90, 2345, 0.987);
-                var expected =
+                const actual = cli.createReport(90, 2345, 0.987);
+                const expected =
                 'Original size:      90 bytes\n' +
                 'Screwed size:     2345 bytes\n' +
                 'Expansion factor: 26.06\n' +
                 'Encoding time:    0.99 s';
                 assert.strictEqual(actual, expected);
-            }
+            },
         );
         it
         (
             'when screwed size is smaller than original size',
-            function ()
+            () =>
             {
-                var actual = cli.createReport(100, 99, 0.005);
-                var expected =
+                const actual = cli.createReport(100, 99, 0.005);
+                const expected =
                 'Original size:    100 bytes\n' +
                 'Screwed size:      99 bytes\n' +
                 'Expansion factor: 0.99\n' +
                 'Encoding time:    0.01 s';
                 assert.strictEqual(actual, expected);
-            }
+            },
         );
         it
         (
             'when original size is 1',
-            function ()
+            () =>
             {
-                var actual = cli.createReport(1, 6, 0.004);
-                var expected =
+                const actual = cli.createReport(1, 6, 0.004);
+                const expected =
                 'Original size:    1 byte\n' +
                 'Screwed size:     6 bytes\n' +
                 'Expansion factor: 6.00\n' +
                 'Encoding time:    < 0.01 s';
                 assert.strictEqual(actual, expected);
-            }
+            },
         );
         it
         (
             'when original size is 0',
-            function ()
+            () =>
             {
-                var actual = cli.createReport(0, 0, 0);
-                var expected =
+                const actual = cli.createReport(0, 0, 0);
+                const expected =
                 'Original size:    0 bytes\n' +
                 'Screwed size:     0 bytes\n' +
                 'Expansion factor: -\n' +
                 'Encoding time:    < 0.01 s';
                 assert.strictEqual(actual, expected);
-            }
+            },
         );
-    }
+    },
 );
 
 describe
 (
     'createDiagnosticReport',
-    function ()
+    () =>
     {
-        function makePerfInfoList(name)
+        function makePerfInfoList(name, ...perfInfoList)
         {
-            var perfInfoList = Array.prototype.slice.call(arguments, 1);
             perfInfoList.name = name;
             return perfInfoList;
         }
@@ -596,9 +568,9 @@ describe
         it
         (
             'works as expected',
-            function ()
+            () =>
             {
-                var actual =
+                const actual =
                 cli.createDiagnosticReport
                 (
                     [
@@ -620,7 +592,7 @@ describe
                                             status:         'used',
                                             outputLength:   50,
                                             time:           45,
-                                        }
+                                        },
                                     ),
                                     makePerfInfoList
                                     (
@@ -640,18 +612,18 @@ describe
                                                         status:         'used',
                                                         outputLength:   22,
                                                         time:           66,
-                                                    }
+                                                    },
                                                 ),
                                             ],
-                                        }
+                                        },
                                     ),
                                 ],
                             },
-                            { strategyName: 'strategyB', status: 'skipped' }
+                            { strategyName: 'strategyB', status: 'skipped' },
                         ),
-                    ]
+                    ],
                 );
-                var expected =
+                const expected =
                 '\n' +
                 'Strategy                    Status         Length  Time (ms)\n' +
                 '────────────────────────────────────────────────────────────\n' +
@@ -666,7 +638,7 @@ describe
                 '│\n' +
                 '└strategyB                  skipped             -          -\n';
                 assert.strictEqual(actual, expected);
-            }
+            },
         );
-    }
+    },
 );

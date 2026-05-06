@@ -1,6 +1,6 @@
 {
   "name": "jscrewit",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "description": "Converts plain JavaScript into JSFuck code, which consists of only six different characters: ! ( ) + [ ]",
   "keywords": [
     "esoteric",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fasttime/JScrewIt.git"
+    "url": "git+https://github.com/fasttime/JScrewIt.git"
   },
   "scripts": {
     "build": "npm install && npm run -ws build && gulp",
@@ -79,6 +79,9 @@
     "typedoc-plugin-markdown": "latest",
     "typescript": "latest",
     "uglify-js": "3.19.1"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "workspaces": [
     "./packages/*"

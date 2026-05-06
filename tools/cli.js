@@ -1,6 +1,7 @@
 'use strict';
 
-const timeUtils = require('./time-utils');
+const { parseArgs } = require('node:util');
+const timeUtils     = require('./time-utils');
 
 function byteCount(size, width)
 {
@@ -80,118 +81,59 @@ function formatPerfInfoList(perfInfoList, padding, paddingChars)
     return str;
 }
 
-function parseCommandLine(argv)
+function parseCommandLine([,, ...args])
 {
-    function parseFeatures()
-    {
-        const arg2 = argv[++index];
-        if (arg2 === undefined)
-            throw Error(`option ${quote(arg)} requires an argument`);
-        options.features = arg2.trim().split(/(?:\s+|\s*,\s*)/);
-    }
-
-    function parseFlag(char)
-    {
-        switch (char)
+    const parsed =
+    parseArgs
+    (
         {
-        case 'c':
-        case 'w':
-            wrapMode = 'call';
-            break;
-        case 'd':
-            options.perfInfo = { };
-            break;
-        case 'e':
-            wrapMode = 'eval';
-            break;
-        case 't':
-            options.trimCode = true;
-            break;
-        case 'x':
-            express = true;
-            break;
-        default:
-            throw Error(`unrecognized flag ${quote(char)}`);
-        }
-    }
-
-    function parseRunAs()
-    {
-        const arg2 = argv[++index];
-        if (arg2 === undefined)
-            throw Error(`option ${quote(arg)} requires an argument`);
-        options.runAs = arg2;
-    }
-
-    let inputFileName;
-    let outputFileName;
-    let options = { };
-    let arg;
-    let express;
-    let wrapMode;
-    let index;
-
-    for (index = 2; index < argv.length; ++index)
-    {
-        arg = argv[index];
-        if (/^--/.test(arg))
-        {
-            const flag = arg.slice(2);
-            switch (flag)
+            args,
+            options:
             {
-            case 'diagnostic':
-                options.perfInfo = { };
-                break;
-            case 'features':
-                parseFeatures();
-                break;
-            case 'help':
-            case 'version':
-                return flag;
-            case 'run-as':
-            case 'wrap-with':
-                parseRunAs();
-                break;
-            case 'trim-code':
-                options.trimCode = true;
-                break;
-            default:
-                throw Error(`unrecognized option ${quote(arg)}`);
-            }
-        }
-        else if (/^-/.test(arg))
-        {
-            const flag = arg.slice(1);
-            if (flag === 'f')
-                parseFeatures();
-            else if (flag === 'r')
-                parseRunAs();
-            else
-                flag.split('').forEach(parseFlag);
-        }
-        else
-        {
-            if (outputFileName != null)
-                throw Error(`unexpected argument ${quote(arg)}`);
-            if (inputFileName != null)
-                outputFileName = arg;
-            else
-                inputFileName = arg;
-        }
-    }
-    if (!options.runAs)
+                'call':         { type: 'boolean', short: 'c' },
+                'diagnostic':   { type: 'boolean', short: 'd' },
+                'eval-flag':    { type: 'boolean', short: 'e' },
+                'express':      { type: 'boolean', short: 'x' },
+                'features':     { type: 'string',  short: 'f' },
+                'help':         { type: 'boolean' },
+                'run-as':       { type: 'string',  short: 'r' },
+                'trim-code':    { type: 'boolean', short: 't' },
+                'version':      { type: 'boolean', short: 'v' },
+                'wrap':         { type: 'boolean', short: 'w' },
+            },
+            allowPositionals:   true,
+            strict:             true,
+        },
+    );
+    const { values, positionals } = parsed;
+    if (values.help)
+        return 'help';
+    if (values.version)
+        return 'version';
+    if (positionals.length > 2)
+        throw Error(`Unexpected argument "${positionals[2]}"`);
+    const [inputFileName, outputFileName] = positionals;
+    const options = { };
+    if (values.diagnostic)
+        options.perfInfo = { };
+    const { features } = values;
+    if (features != null)
+        options.features = features.trim().split(/(?:\s+|\s*,\s*)/);
+    if (values['trim-code'])
+        options.trimCode = true;
+    const runAs = values['run-as'];
+    if (runAs != null)
+        options.runAs = runAs;
+    else
     {
-        const runAs = (express ? ['express'] : []).concat(wrapMode || []).join('-');
+        const { express } = values;
+        const wrapMode =
+        values.call ?? values.wrap ? 'call' : values['eval-flag'] ? 'eval' : undefined;
+        const runAs = (express ? ['express'] : []).concat(wrapMode ?? []).join('-');
         if (runAs)
             options.runAs = runAs;
     }
-    const result = { inputFileName, outputFileName, options };
-    return result;
-}
-
-function quote(arg)
-{
-    return `"${arg}"`;
+    return { inputFileName, outputFileName, options };
 }
 
 function widthOf(size)

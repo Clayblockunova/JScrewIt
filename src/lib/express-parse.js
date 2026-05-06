@@ -501,7 +501,7 @@ var tokens =
 
 var tokenCache = createEmpty();
 
-// Reserved words and that cannot be written with escape sequences.
+// Reserved words that cannot be written with escape sequences.
 var INESCAPABLE_WORDS = ['false', 'null', 'true'];
 
 // This list includes reserved words and identifiers that would cause a change in a script's

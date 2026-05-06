@@ -244,6 +244,8 @@ Explorer 11
 JScrewIt 3 drops compatibility with engines not supported by jQuery 4, including Internet Explorer 9
 and 10, the Android Stock Browser, and older Safari and Node.js versions.
 
+This project is tested with BrowserStack.
+
 ### Engine Support Policy
 
 Only the most recent stable version of Chrome, Safari, Edge, Firefox and Opera are guaranteed to be
