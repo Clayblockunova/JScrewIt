@@ -368,15 +368,15 @@ function getFHPaddingEntries(index)
     var V8_SRC                          = Feature.V8_SRC;
     var WINDOW                          = Feature.WINDOW;
 
-    function charDefaultDefinition(char)
+    function charCommonDefinition(char)
     {
-        var solution = this._defaultResolveCharacter(char);
+        var solution = this._commonResolveCharacter(char);
         return solution;
     }
 
-    function defineCharDefault()
+    function defineCharCommon()
     {
-        var entry = define(charDefaultDefinition);
+        var entry = define(charCommonDefinition);
         return entry;
     }
 
@@ -500,7 +500,7 @@ function getFHPaddingEntries(index)
         CHARACTERS[char] =
         [
             defineLocalizedNumeral._callWithFeatures(locale, number, index, arguments, 4),
-            defineCharDefault(),
+            defineCharCommon(),
         ];
     }
 
@@ -671,7 +671,7 @@ function getFHPaddingEntries(index)
         [
             define('"".fontcolor()[12]'),
         ],
-        // '#':
+        // '#'
         // '$'
         '%':
         [
@@ -679,12 +679,12 @@ function getFHPaddingEntries(index)
             define('escape(0 + AT)[20]', AT),
             define('escape(FLAT)[21]', FLAT),
             define('escape(ANY_FUNCTION)[0]', IE_SRC),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         '&':
         [
             define('"".fontcolor("".fontcolor([]))[31]', ESC_HTML_QUOT),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         // '\''
         '(':
@@ -732,7 +732,7 @@ function getFHPaddingEntries(index)
         '?':
         [
             define('(RP_0_S + RegExp())[2]'),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         // '@'
         'A':
@@ -751,7 +751,7 @@ function getFHPaddingEntries(index)
             define('escape(F_A_L_S_E)[11]'),
             define('(RP_4_A + "".fontcolor())[10]', CAPITAL_HTML),
             define('(RP_3_WA + Function("return console")())[11]', CONSOLE),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         'D':
         [
@@ -796,7 +796,7 @@ function getFHPaddingEntries(index)
         'K':
         [
             define('(RP_5_A + "".strike())[10]', CAPITAL_HTML),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         'L':
         [
@@ -822,7 +822,7 @@ function getFHPaddingEntries(index)
             define('btoa("".italics())[0]'),
             define('(RP_0_S + Function("return statusbar")())[11]', BARPROP),
             define('"0".sup()[10]', CAPITAL_HTML),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         'Q':
         [
@@ -921,7 +921,7 @@ function getFHPaddingEntries(index)
         'k':
         [
             define('20[TO_STRING]("21")'),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         'l': '"false"[2]',
         'm':
@@ -945,7 +945,7 @@ function getFHPaddingEntries(index)
         [
             define('212[TO_STRING]("31")[1]'),
             define('"".fontcolor(true + "".fontcolor())[30]', ESC_HTML_QUOT),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
         'r': '"true"[1]',
         's': '"false"[3]',
@@ -1070,7 +1070,7 @@ function getFHPaddingEntries(index)
             define('Infinity[TO_LOCALE_STRING]("ja").at("-1")', AT),
             define('Infinity[TO_LOCALE_STRING]()', LOCALE_INFINITY),
             define('Infinity[TO_LOCALE_STRING]("ru")', RUSSIAN_INFINITY),
-            defineCharDefault(),
+            defineCharCommon(),
         ],
     }); // eslint-disable-line @origin-1/bracket-layout
 
