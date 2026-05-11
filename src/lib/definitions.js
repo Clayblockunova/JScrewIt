@@ -718,7 +718,6 @@ function getFHPaddingEntries(index)
         ';':
         [
             define('"".fontcolor("".fontcolor())[30]', ESC_HTML_QUOT),
-            defineCharDefault(),
         ],
         '<':
         [

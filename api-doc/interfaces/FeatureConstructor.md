@@ -678,6 +678,42 @@ Available in Chrome, Edge, Firefox, Internet Explorer 11 on Windows 10, Safari, 
 
 ***
 
+### LOCALE\_NUMERALS\_IE11\_WIN7
+
+> **LOCALE\_NUMERALS\_IE11\_WIN7**: [`ElementaryFeature`](ElementaryFeature.md)
+
+Localized number formatting exclusive to Interner Explorer 11 in Windows 7.
+
+This includes Latvian string representation of Infinity \("bezgalība"\) and Russian string representation of Infinity \("бесконечность"\).
+
+#### Remarks
+
+This feature is not available in any of the supported engines.
+
+#### Inherited from
+
+[`FeatureAll`](FeatureAll.md).[`LOCALE_NUMERALS_IE11_WIN7`](FeatureAll.md#locale_numerals_ie11_win7)
+
+***
+
+### LOCALE\_NUMERALS\_IE11\_WIN7\_8
+
+> **LOCALE\_NUMERALS\_IE11\_WIN7\_8**: [`ElementaryFeature`](ElementaryFeature.md)
+
+Localized number formatting exclusive to Interner Explorer 11 in Windows 7 and 8.
+
+This includes all features of LOCALE_NUMERALS plus the output of the letters in the second word of the Arabic string representation of NaN \("برقم"\), the letters in the Arabic string representation of Infinity \("+لا نهاية"\), the letters in the the Czech string representation of NaN \("Není číslo"\), the letters in the the Greek string representation of Infinity \("Άπειρο"\), the letters in the Greek string representation of NaN \("μη αριθμός"\), the letters in the Hebrew string representation of NaN \("לא מספר"\), the characters in the Japanese string representation of Infinity \("+∞"\), the characters in the Japanese string representation of NaN \("NaN \(非数値\)"\), the letters in the Lithuanian string representation of Infinity \("begalybė"\), the letters in the Polish string representation of Infinity \("+nieskończoność"\), the characters in the Chinese string representation of Infinity \("正无穷大" or "正無窮大"\), the characters in the Simplified Chinese string representation of NaN \("非数字"\).
+
+#### Remarks
+
+This feature is not available in any of the supported engines.
+
+#### Inherited from
+
+[`FeatureAll`](FeatureAll.md).[`LOCALE_NUMERALS_IE11_WIN7_8`](FeatureAll.md#locale_numerals_ie11_win7_8)
+
+***
+
 ### NAME
 
 > **NAME**: [`ElementaryFeature`](ElementaryFeature.md)
