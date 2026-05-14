@@ -358,7 +358,6 @@ var featureInfos =
             checkLocaleNumeral('zh-cn', NaN, /^非数字/);
             return available;
         },
-        excludes: ['LOCALE_INFINITY'],
     },
     NAME:
     {
