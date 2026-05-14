@@ -291,8 +291,6 @@ var featureInfos =
             var available = Infinity.toLocaleString() === '∞';
             return available;
         },
-        includes:    ['RUSSIAN_INFINITY'],
-        excludes:    ['LOCALE_NUMERALS_IE11_WIN7_8'],
     },
     LOCALE_NUMERALS_BN:
     {
@@ -698,6 +696,18 @@ var featureInfos =
         ],
         attributes: { 'char-increment-restriction': null, 'web-worker-restriction': null },
     },
+    IE_11_WIN_7:
+    {
+        inherits:               'IE_11',
+        versions:               ['11'],
+        compatibilityTag:       'on Windows 7',
+        compatibilityShortTag:  'W8',
+        includes:
+        {
+            LOCALE_NUMERALS_IE11_WIN7:   true,
+            LOCALE_NUMERALS_IE11_WIN7_8: true,
+        },
+    },
     IE_11_WIN_8:
     {
         inherits:               'IE_11',
@@ -705,11 +715,14 @@ var featureInfos =
         compatibilityTag:       'on Windows 8',
         compatibilityShortTag:  'W8',
         includes:
-        { LOCALE_NUMERALS_IE11_WIN7: false, RUSSIAN_INFINITY: true },
+        {
+            LOCALE_NUMERALS_IE11_WIN7_8: true,
+            RUSSIAN_INFINITY:            true,
+        },
     },
     IE_11_WIN_10:
     {
-        inherits:               'IE_11_WIN_8',
+        inherits:               'IE_11',
         versions:               ['11'],
         compatibilityTag:       'on Windows 10',
         compatibilityShortTag:  'W10',
@@ -718,7 +731,7 @@ var featureInfos =
             LOCALE_INFINITY:             true,
             LOCALE_NUMERALS_BN:          true,
             LOCALE_NUMERALS_EXT:         true,
-            LOCALE_NUMERALS_IE11_WIN7_8: false,
+            RUSSIAN_INFINITY:            true,
         },
     },
     NODE_20:

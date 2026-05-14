@@ -336,6 +336,14 @@ Features available in Internet Explorer 11 on Windows 10.
 
 ***
 
+### IE\_11\_WIN\_7
+
+> **IE\_11\_WIN\_7**: [`PredefinedFeature`](PredefinedFeature.md)
+
+Features available in Internet Explorer 11 on Windows 7.
+
+***
+
 ### IE\_11\_WIN\_8
 
 > **IE\_11\_WIN\_8**: [`PredefinedFeature`](PredefinedFeature.md)
@@ -426,11 +434,9 @@ Available in Chrome, Edge, Firefox, Internet Explorer 11 on Windows 10, Safari, 
 
 Localized number formatting exclusive to Interner Explorer 11 in Windows 7.
 
-This includes Latvian string representation of Infinity \("bezgalība"\) and Russian string representation of Infinity \("бесконечность"\).
-
 #### Remarks
 
-This feature is not available in any of the supported engines.
+Available in Internet Explorer 11 on Windows 7, on Windows 8, and on Windows 10 before 11 on Windows 8 and on Windows 10.
 
 ***
 
@@ -440,11 +446,9 @@ This feature is not available in any of the supported engines.
 
 Localized number formatting exclusive to Interner Explorer 11 in Windows 7 and 8.
 
-This includes all features of LOCALE_NUMERALS plus the output of the letters in the second word of the Arabic string representation of NaN \("برقم"\), the letters in the Arabic string representation of Infinity \("+لا نهاية"\), the letters in the the Czech string representation of NaN \("Není číslo"\), the letters in the the Greek string representation of Infinity \("Άπειρο"\), the letters in the Greek string representation of NaN \("μη αριθμός"\), the letters in the Hebrew string representation of NaN \("לא מספר"\), the characters in the Japanese string representation of Infinity \("+∞"\), the characters in the Japanese string representation of NaN \("NaN \(非数値\)"\), the letters in the Lithuanian string representation of Infinity \("begalybė"\), the letters in the Polish string representation of Infinity \("+nieskończoność"\), the characters in the Chinese string representation of Infinity \("正无穷大" or "正無窮大"\), the characters in the Simplified Chinese string representation of NaN \("非数字"\).
-
 #### Remarks
 
-This feature is not available in any of the supported engines.
+Available in Internet Explorer 11 on Windows 7, on Windows 8, and on Windows 10 before 11 on Windows 10.
 
 ***
 
