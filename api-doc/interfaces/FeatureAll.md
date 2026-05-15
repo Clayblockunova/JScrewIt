@@ -436,7 +436,7 @@ Localized number formatting exclusive to Interner Explorer 11 in Windows 7.
 
 #### Remarks
 
-Available in Internet Explorer 11 on Windows 7, on Windows 8, and on Windows 10 before 11 on Windows 8 and on Windows 10.
+Available in Internet Explorer 11 on Windows 7.
 
 ***
 
@@ -448,7 +448,7 @@ Localized number formatting exclusive to Interner Explorer 11 in Windows 7 and 8
 
 #### Remarks
 
-Available in Internet Explorer 11 on Windows 7, on Windows 8, and on Windows 10 before 11 on Windows 10.
+Available in Internet Explorer 11 on Windows 7 and on Windows 8.
 
 ***
 
